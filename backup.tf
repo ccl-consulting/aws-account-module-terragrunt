@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "assume_role" {
 #####
 
 module "central-backup-policy" {
-  source = "git::https://github.com/ccl-consulting/aws-lz-backups-terragrunt?ref=v.0.0.1"
+  source = "git::https://github.com/ccl-consulting/aws-lz-backups-terragrunt?ref=v0.0.1"
 
 
   name                       = "organization-backup-policy"
