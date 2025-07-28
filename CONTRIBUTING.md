@@ -2,29 +2,17 @@
 
 Thank you for your interest in contributing to the AWS Account Module Terragrunt project! This document outlines the process for contributing to this repository and helps ensure a smooth collaboration experience.
 
-## 🎯 Project Overview
+## Project Overview
 
 This project provides enterprise-grade AWS Landing Zone automation using Terragrunt. We welcome contributions that improve functionality, add new features, fix bugs, enhance documentation, or provide additional examples.
 
-## 🔄 Development Workflow
+## Development Workflow
 
 Our development process follows a simple and straightforward workflow designed to maintain code quality while enabling efficient collaboration.
 
 ### Process Overview
 
-```mermaid
-flowchart TD
-    A[Fork Repository] --> B[Create Feature Branch]
-    B --> C[Make Changes]
-    C --> D[Test Locally]
-    D --> E[Submit Pull Request]
-    E --> F[Admin Review]
-    F --> G{Review Approved?}
-    G -->|Yes| H[Admin Merges]
-    G -->|No| I[Address Feedback]
-    I --> F
-    H --> J[Changes Deployed]
-```
+The contribution process is: Fork Repository → Create Feature Branch → Make Changes → Test Locally → Submit Pull Request → Admin Review → Merge after approval
 
 ### Step-by-Step Process
 
@@ -83,24 +71,24 @@ flowchart TD
    - Admins may provide feedback or request changes
    - The review process ensures code quality and project consistency
 
-## 📋 Branch Protection Rules
+## Branch Protection Rules
 
 This repository implements the following branch protection rules:
 
 ### Main Branch Protection
-- ✅ **Require pull request reviews** - All changes must go through PR review
-- ✅ **Require review from admins** - Only repository admins can approve PRs
-- ✅ **Dismiss stale reviews** - New commits dismiss previous approvals
-- ✅ **Require status checks** - CI/CD pipeline must pass
-- ✅ **Require branches to be up to date** - Must be current with main branch
-- ✅ **Restrict pushes to admins only** - Direct pushes only allowed for admins
+- **Require pull request reviews** - All changes must go through PR review
+- **Require review from admins** - Only repository admins can approve PRs
+- **Dismiss stale reviews** - New commits dismiss previous approvals
+- **Require status checks** - CI/CD pipeline must pass
+- **Require branches to be up to date** - Must be current with main branch
+- **Restrict pushes to admins only** - Direct pushes only allowed for admins
 
 ### Admin Privileges
-- 🔑 **Merge without review** - Admins can merge their own changes (emergency fixes)
-- 🔑 **Override status checks** - Admins can bypass failed CI checks when necessary
-- 🔑 **Force push** - Admins can force push to protected branches (use with caution)
+- **Merge without review** - Admins can merge their own changes (emergency fixes)
+- **Override status checks** - Admins can bypass failed CI checks when necessary
+- **Force push** - Admins can force push to protected branches (use with caution)
 
-## 📝 Code Standards and Guidelines
+## Code Standards and Guidelines
 
 ### Terraform/Terragrunt Standards
 
@@ -150,34 +138,7 @@ This repository implements the following branch protection rules:
    }
    ```
 
-### File Organization
-
-```
-aws-account-module-terragrunt/
-├── README.md                    # Main documentation
-├── CONTRIBUTING.md             # This file
-├── LICENSE                     # License information
-├── versions.tf                 # Terraform and provider versions
-├── variables.tf                # Input variables
-├── backend.tf                  # Remote state configuration
-├── organization.tf             # AWS Organizations resources
-├── control-tower.tf           # Control Tower resources
-├── backup.tf                  # Backup configuration
-├── terragrunt.hcl             # Main Terragrunt configuration
-├── .github/
-│   └── workflows/
-│       └── ci.yml             # GitHub Actions workflow
-├── examples/                   # Example configurations
-│   ├── README.md              # Examples documentation
-│   ├── simple-startup.hcl     # Basic configuration
-│   ├── development-environment.hcl
-│   ├── production-landing-zone.hcl
-│   └── enterprise-multi-region.hcl
-└── template/
-    └── landingzonemanifest.tftpl  # Control Tower manifest template
-```
-
-## 🧪 Testing Requirements
+## Testing Requirements
 
 ### Local Testing Checklist
 
@@ -227,111 +188,40 @@ Before submitting a pull request, ensure all the following tests pass:
 
 Our GitHub Actions workflow automatically runs:
 
-- ✅ Terraform format checking
-- ✅ Terraform validation
-- ✅ Terragrunt validation
-- ✅ Security scanning with Checkov
-- ✅ Code linting with TFLint
-- ✅ Example configuration testing
-- ✅ Documentation generation
+- Terraform format checking
+- Terraform validation
+- Terragrunt validation
+- Security scanning with Checkov
+- Code linting with TFLint
+- Example configuration testing
 
-## 📖 Documentation Standards
-
-### README Updates
-
-When adding new features or making significant changes:
-
-1. Update the main README.md with new features or configuration options
-2. Add examples to demonstrate new functionality
-3. Update the badges if new tools or versions are supported
-4. Ensure all links are working and up to date
-
-### Code Documentation
-
-1. **Inline Comments**
-   ```hcl
-   # Create organizational units for different workload types
-   # This provides isolation between production, staging, and development environments
-   resource "aws_organizations_organizational_unit" "workloads" {
-     name      = "Workloads"
-     parent_id = aws_organizations_organization.org.roots[0].id
-     
-     tags = merge(var.tags, {
-       "Purpose" = "Workload Account Organization"
-     })
-   }
-   ```
-
-2. **Variable Documentation**
-   ```hcl
-   variable "org_accounts" {
-     description = <<-EOF
-       Organization account structure definition.
-       
-       This variable defines the account structure for the organization including:
-       - workloads: Accounts for different environments (prod, staging, dev)
-       - common_services: Shared service accounts (backup, monitoring, etc.)
-       
-       Example:
-       org_accounts = {
-         workloads = {
-           prod    = ["prod-web", "prod-api"]
-           staging = ["stage-web", "stage-api"]
-           dev     = ["dev-shared"]
-         }
-         common_services = ["backup", "monitoring"]
-       }
-     EOF
-     
-     type = object({
-       workloads = object({
-         prod    = list(string)
-         staging = list(string)
-         dev     = list(string)
-       })
-       common_services = list(string)
-     })
-   }
-   ```
-
-### Example Documentation
-
-When adding new examples:
-
-1. Create a comprehensive example file in the `examples/` directory
-2. Add documentation to `examples/README.md` explaining:
-   - Use case for the example
-   - Key features demonstrated
-   - Deployment instructions
-   - Customization options
-
-## 🎯 Contribution Guidelines
+## Contribution Guidelines
 
 ### Types of Contributions Welcome
 
-1. **🐛 Bug Fixes**
+1. **Bug Fixes**
    - Fix issues in existing functionality
    - Improve error handling
    - Resolve compatibility problems
 
-2. **✨ New Features**
+2. **New Features**
    - Additional AWS services integration
    - New organizational unit structures
    - Enhanced security controls
    - Cost optimization features
 
-3. **📝 Documentation Improvements**
+3. **Documentation Improvements**
    - Clarify existing documentation
    - Add missing examples
    - Improve getting started guides
    - Add troubleshooting sections
 
-4. **🧪 Testing Enhancements**
+4. **Testing Enhancements**
    - Additional test cases
    - Improved CI/CD workflows
    - Better validation scripts
 
-5. **🔧 Configuration Examples**
+5. **Configuration Examples**
    - Industry-specific configurations
    - Different organizational patterns
    - Regional deployment variations
@@ -379,7 +269,7 @@ deployments including detailed configuration comments
 and deployment instructions.
 ```
 
-## 🚀 Release Process
+## Release Process
 
 ### Versioning
 
@@ -404,13 +294,13 @@ This project follows [Semantic Versioning](https://semver.org/):
    - Security scan reports
    - Example configurations
 
-## 🆘 Getting Help
+## Getting Help
 
 ### Where to Ask Questions
 
-1. **💬 GitHub Discussions** - For general questions and discussions
-2. **🐛 GitHub Issues** - For bugs and feature requests
-3. **📧 Email Support** - Contact CCL Consulting for enterprise support
+1. **GitHub Discussions** - For general questions and discussions
+2. **GitHub Issues** - For bugs and feature requests
+3. **Email Support** - Contact CCL Consulting for enterprise support
 
 ### Before Asking for Help
 
@@ -460,15 +350,15 @@ What actually happened.
 Any other relevant information.
 ```
 
-## 🏆 Recognition
+## Recognition
 
 Contributors will be recognized in the following ways:
 
-- 🌟 **Contributors section** in README.md
-- 🎉 **Release notes mention** for significant contributions
-- 💼 **Professional references** available upon request (for significant contributors)
+- **Contributors section** in README.md
+- **Release notes mention** for significant contributions
+- **Professional references** available upon request (for significant contributors)
 
-## 📞 Contact Information
+## Contact Information
 
 ### Project Maintainers
 
@@ -477,14 +367,14 @@ Contributors will be recognized in the following ways:
 
 ### Communication Channels
 
-- 🌐 **Website**: [cclconsulting.com](https://cclconsulting.com)
-- 📧 **Email**: [support@cclconsulting.com](mailto:support@cclconsulting.com)
-- 💼 **LinkedIn**: [CCL Consulting LinkedIn](https://linkedin.com/company/ccl-consulting)
+- **Website**: [cclconsulting.com](https://cclconsulting.com)
+- **Email**: [support@cclconsulting.com](mailto:support@cclconsulting.com)
+- **LinkedIn**: [CCL Consulting LinkedIn](https://linkedin.com/company/ccl-consulting)
 
 ---
 
-## 🙏 Thank You
+## Thank You
 
 We appreciate your interest in contributing to this project! Your contributions help make AWS Landing Zone deployment more accessible and reliable for organizations of all sizes.
 
-**Happy coding! 🚀**
+**Happy coding!**

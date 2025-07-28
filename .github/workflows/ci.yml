@@ -66,17 +66,8 @@ jobs:
         checkov -d . \
           --framework terraform \
           --output cli \
-          --output json \
-          --output-file-path console,checkov-report.json \
           --quiet \
           --compact || true
-
-    - name: Upload Checkov Report
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: checkov-report
-        path: checkov-report.json
 
   lint:
     name: Terraform Lint
@@ -102,28 +93,6 @@ jobs:
 
     - name: Run TFLint
       run: tflint --recursive
-
-  docs:
-    name: Generate Documentation
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ${{ env.TF_VERSION }}
-
-    - name: Generate Terraform Docs
-      uses: terraform-docs/gh-actions@v1
-      with:
-        working-dir: .
-        output-file: TERRAFORM_DOCS.md
-        output-method: inject
-        git-push: "false"
 
   test-examples:
     name: Test Example Configurations
@@ -180,20 +149,20 @@ jobs:
 
     - name: Generate Release Notes
       run: |
-        echo "## 🚀 What's New" > release-notes.md
+        echo "## What's New" > release-notes.md
         echo "" >> release-notes.md
         echo "This release includes:" >> release-notes.md
-        echo "- ✅ Validated Terraform configurations" >> release-notes.md
-        echo "- 🔒 Security scan passed" >> release-notes.md
-        echo "- 📝 Linting completed" >> release-notes.md
-        echo "- 🧪 Example configurations tested" >> release-notes.md
+        echo "- Validated Terraform configurations" >> release-notes.md
+        echo "- Security scan passed" >> release-notes.md
+        echo "- Linting completed" >> release-notes.md
+        echo "- Example configurations tested" >> release-notes.md
         echo "" >> release-notes.md
-        echo "## 📋 Compatibility" >> release-notes.md
+        echo "## Compatibility" >> release-notes.md
         echo "- **Terraform**: >= ${{ env.TF_VERSION }}" >> release-notes.md
         echo "- **Terragrunt**: >= ${{ env.TG_VERSION }}" >> release-notes.md
         echo "- **AWS Provider**: >= 4.16" >> release-notes.md
         echo "" >> release-notes.md
-        echo "## 📥 Installation" >> release-notes.md
+        echo "## Installation" >> release-notes.md
         echo '```hcl' >> release-notes.md
         echo 'terraform {' >> release-notes.md
         echo '  source = "git::https://github.com/${{ github.repository }}.git///?ref=${{ github.event.release.tag_name }}"' >> release-notes.md
@@ -223,10 +192,10 @@ jobs:
     steps:
     - name: Workflow Summary
       run: |
-        echo "## 📊 Workflow Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## Workflow Summary" >> $GITHUB_STEP_SUMMARY
         echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
         echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-        echo "| Validation | ${{ needs.validate.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| Security Scan | ${{ needs.security-scan.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| Linting | ${{ needs.lint.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| Example Tests | ${{ needs.test-examples.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Validation | ${{ needs.validate.result == 'success' && 'Passed' || 'Failed' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Security Scan | ${{ needs.security-scan.result == 'success' && 'Passed' || 'Failed' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Linting | ${{ needs.lint.result == 'success' && 'Passed' || 'Failed' }} |" >> $GITHUB_STEP_SUMMARY
+        echo "| Example Tests | ${{ needs.test-examples.result == 'success' && 'Passed' || 'Failed' }} |" >> $GITHUB_STEP_SUMMARY

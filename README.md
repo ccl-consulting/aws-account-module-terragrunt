@@ -1,6 +1,6 @@
 # AWS Account Module - Terragrunt
 
-[![CI/CD Pipeline](https://github.com/YOUR_GITHUB_USERNAME/aws-account-module-terragrunt/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/aws-account-module-terragrunt/actions/workflows/ci.yml)
+
 [![AWS Landing Zone](https://img.shields.io/badge/AWS-Landing%20Zone-orange?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/solutions/implementations/aws-landing-zone/)
 [![CCL Module](https://img.shields.io/badge/CCL-Consulting%20Module-blue?logo=terraform&logoColor=white)](https://cclconsulting.com)
 [![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.2.0-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
@@ -16,18 +16,18 @@
 
 This Terragrunt module provides a complete solution for establishing an AWS Landing Zone with Control Tower, enabling organizations to deploy secure, well-architected multi-account environments at scale. Built by CCL Consulting, this module implements AWS best practices for enterprise cloud governance.
 
-###  Key Features
+### Key Features
 
--  **AWS Control Tower Integration** - Automated Landing Zone deployment with guardrails
--  **Multi-Account Architecture** - Secure account isolation following AWS best practices  
--  **Multi-Region Support** - Deploy across multiple AWS regions with centralized governance
--  **Organizational Units** - Structured account organization with workload separation
--  **Security by Design** - Built-in security controls and compliance frameworks
--  **Cross-Account Backup** - Automated backup policies across all accounts
--  **Comprehensive Tagging** - Cost allocation and governance through standardized tagging
--  **Extensive Examples** - Production-ready configurations for various use cases
+- **AWS Control Tower Integration** - Automated Landing Zone deployment with guardrails
+- **Multi-Account Architecture** - Secure account isolation following AWS best practices  
+- **Multi-Region Support** - Deploy across multiple AWS regions with centralized governance
+- **Organizational Units** - Structured account organization with workload separation
+- **Security by Design** - Built-in security controls and compliance frameworks
+- **Cross-Account Backup** - Automated backup policies across all accounts
+- **Comprehensive Tagging** - Cost allocation and governance through standardized tagging
+- **Extensive Examples** - Production-ready configurations for various use cases
 
-##  Architecture
+## Architecture
 
 ```mermaid
 graph TB
@@ -79,7 +79,7 @@ graph TB
     ROOT --> SUSP
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -150,7 +150,7 @@ Accounts are created using the format: `{email_local_part}+{account-name}@{email
 - `aws+security@company.com`
 - `aws+logging@company.com`
 
-## 📁 Examples
+## Examples
 
 We provide comprehensive examples for different organizational needs:
 
@@ -161,30 +161,30 @@ We provide comprehensive examples for different organizational needs:
 | **[Production Landing Zone](examples/production-landing-zone.hcl)** | Large production | Multi-region, comprehensive governance |
 | **[Enterprise Multi-Region](examples/enterprise-multi-region.hcl)** | Global enterprises | Multi-region, business unit organization |
 
-👉 **[View Detailed Examples Documentation](examples/README.md)**
+**[View Detailed Examples Documentation](examples/README.md)**
 
-## 🔐 Security & Compliance
+## Security & Compliance
 
 ### Built-in Security Controls
 
-- ✅ **AWS Control Tower Guardrails** - Preventive and detective controls
-- ✅ **IAM Best Practices** - Least privilege access with proper role separation
-- ✅ **CloudTrail Logging** - Centralized audit logging across all accounts
-- ✅ **AWS Config** - Configuration compliance monitoring
-- ✅ **Cross-Account Backup** - Automated backup policies with encryption
-- ✅ **Network Security** - VPC isolation and security group controls
+- **AWS Control Tower Guardrails** - Preventive and detective controls
+- **IAM Best Practices** - Least privilege access with proper role separation
+- **CloudTrail Logging** - Centralized audit logging across all accounts
+- **AWS Config** - Configuration compliance monitoring
+- **Cross-Account Backup** - Automated backup policies with encryption
+- **Network Security** - VPC isolation and security group controls
 
 ### Compliance Frameworks
 
 This module helps achieve compliance with:
 
-- 🏛️ **SOC 2 Type II** - Security, availability, and confidentiality controls
-- 🌐 **ISO 27001** - Information security management systems
-- 🏦 **PCI DSS** - Payment card industry data security standards
-- 🏥 **HIPAA** - Healthcare information protection (when properly configured)
-- 🇪🇺 **GDPR** - General Data Protection Regulation compliance
+- **SOC 2 Type II** - Security, availability, and confidentiality controls
+- **ISO 27001** - Information security management systems
+- **PCI DSS** - Payment card industry data security standards
+- **HIPAA** - Healthcare information protection (when properly configured)
+- **GDPR** - General Data Protection Regulation compliance
 
-## 🏷️ Tagging Strategy
+## Tagging Strategy
 
 ### Standard Tags Applied
 
@@ -207,7 +207,7 @@ tags = {
 }
 ```
 
-## 🔧 Advanced Configuration
+## Advanced Configuration
 
 ### Multi-Region Deployment
 
@@ -254,7 +254,7 @@ inputs = {
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 Run the complete test suite:
 
@@ -272,32 +272,32 @@ tflint --recursive
 terragrunt plan --terragrunt-config-path examples/simple-startup.hcl
 ```
 
-## 📊 Monitoring & Observability
+## Monitoring & Observability
 
 ### CloudWatch Integration
 
-- 📈 **Cross-Account Dashboards** - Centralized monitoring across all accounts
-- 🚨 **Automated Alerting** - Cost, security, and operational alerts
-- 📊 **Cost Analytics** - Detailed cost breakdown by account and tag
+- **Cross-Account Dashboards** - Centralized monitoring across all accounts
+- **Automated Alerting** - Cost, security, and operational alerts
+- **Cost Analytics** - Detailed cost breakdown by account and tag
 
 ### AWS Config Rules
 
-- ✅ **S3 Bucket Encryption** - Ensure all buckets are encrypted
-- ✅ **Root Access Monitoring** - Alert on root account usage
-- ✅ **Security Group Rules** - Validate security group configurations
-- ✅ **IAM Policy Compliance** - Check for overly permissive policies
+- **S3 Bucket Encryption** - Ensure all buckets are encrypted
+- **Root Access Monitoring** - Alert on root account usage
+- **Security Group Rules** - Validate security group configurations
+- **IAM Policy Compliance** - Check for overly permissive policies
 
-## 🚀 CI/CD Integration
+## CI/CD Integration
 
 This module includes a comprehensive GitHub Actions workflow:
 
-- ✅ **Terraform Validation** - Syntax and configuration validation
-- 🔒 **Security Scanning** - Checkov security analysis
-- 📝 **Code Linting** - TFLint code quality checks  
-- 🧪 **Example Testing** - Validate all example configurations
-- 📦 **Automated Releases** - Semantic versioning and release notes
+- **Terraform Validation** - Syntax and configuration validation
+- **Security Scanning** - Checkov security analysis
+- **Code Linting** - TFLint code quality checks  
+- **Example Testing** - Validate all example configurations
+- **Automated Releases** - Semantic versioning and release notes
 
-## 🔄 Migration & Upgrades
+## Migration & Upgrades
 
 ### From Existing AWS Accounts
 
@@ -323,7 +323,7 @@ terragrunt plan
 terragrunt apply
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -344,47 +344,47 @@ export TERRAGRUNT_LOG_LEVEL=debug
 terragrunt apply
 ```
 
-## 📚 Additional Resources
+## Additional Resources
 
 ### Documentation
 
-- 📖 **[AWS Control Tower User Guide](https://docs.aws.amazon.com/controltower/)**
-- 📖 **[AWS Organizations Best Practices](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_best-practices.html)**
-- 📖 **[Terragrunt Documentation](https://terragrunt.gruntwork.io/)**
+- **[AWS Control Tower User Guide](https://docs.aws.amazon.com/controltower/)**
+- **[AWS Organizations Best Practices](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_best-practices.html)**
+- **[Terragrunt Documentation](https://terragrunt.gruntwork.io/)**
 
 ### AWS Well-Architected
 
-- 🏗️ **[Security Pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/)**
-- 💰 **[Cost Optimization Pillar](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/)**
-- ⚡ **[Operational Excellence Pillar](https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/)**
+- **[Security Pillar](https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/)**
+- **[Cost Optimization Pillar](https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/)**
+- **[Operational Excellence Pillar](https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/)**
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
 
-- 🔄 Development workflow
-- 📝 Code standards and formatting
-- 🧪 Testing requirements
-- 📋 Pull request process
+- Development workflow
+- Code standards and formatting
+- Testing requirements
+- Pull request process
 
-## 🆘 Support
+## Support
 
 ### CCL Consulting Support
 
-- 💼 **Enterprise Support**: Contact our cloud architecture team
-- 📧 **Email**: [support@cclconsulting.com](mailto:support@cclconsulting.com)
-- 🌐 **Website**: [cclconsulting.com](https://cclconsulting.com)
+- **Enterprise Support**: Contact our cloud architecture team
+- **Email**: [support@cclconsulting.com](mailto:support@cclconsulting.com)
+- **Website**: [cclconsulting.com](https://cclconsulting.com)
 
 ### Community Support
 
-- 🐛 **Issues**: [GitHub Issues](https://github.com/YOUR_GITHUB_USERNAME/aws-account-module-terragrunt/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/YOUR_GITHUB_USERNAME/aws-account-module-terragrunt/discussions)
+- **Issues**: [GitHub Issues](https://github.com/YOUR_GITHUB_USERNAME/aws-account-module-terragrunt/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/YOUR_GITHUB_USERNAME/aws-account-module-terragrunt/discussions)
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **HashiCorp** - For Terraform and Terragrunt
 - **AWS** - For Control Tower and Organizations
@@ -395,9 +395,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**⭐ If this module helped you, please consider giving it a star! ⭐**
+**If this module helped you, please consider giving it a star!**
 
-Made with ❤️ by [CCL Consulting](https://cclconsulting.com)
+Made with care by [CCL Consulting](https://cclconsulting.com)
 
 </div>
 

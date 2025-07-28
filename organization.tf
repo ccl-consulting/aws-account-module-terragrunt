@@ -138,7 +138,7 @@ locals {
   landing_zone_accounts = [
     aws_organizations_account.backups,
     aws_organizations_account.logging,
-#    aws_organizations_account.management,
+    #    aws_organizations_account.management,
     aws_organizations_account.security
   ]
 
