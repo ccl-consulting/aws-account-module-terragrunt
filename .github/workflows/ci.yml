@@ -292,9 +292,16 @@ jobs:
         echo "Generated terragrunt.hcl:"
         cat terragrunt.hcl
         
-        # Initialize and validate (without planning due to missing AWS credentials)
-        terragrunt init --terragrunt-non-interactive
-        terragrunt validate --terragrunt-non-interactive
+        # Copy module files to avoid backend conflicts
+        cp -r ../*.tf .
+        cp -r ../modules . 2>/dev/null || true
+        
+        # Remove backend configuration for testing
+        rm -f backend.tf
+        
+        # Initialize and validate without backend
+        terraform init -backend=false
+        terraform validate
         
         echo "Example ${{ matrix.example }} validation completed successfully"
 
