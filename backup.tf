@@ -115,26 +115,73 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 #####
-# Create backup policy
+# Create backup vault
 #####
 
-module "central-backup-policy" {
-  source = "git::https://github.com/ccl-consulting/aws-lz-backups-terragrunt?ref=v0.0.1"
+resource "aws_backup_vault" "organization_backup_vault" {
+  name        = local.backup_vault_name
+  kms_key_arn = aws_kms_key.backup_key.arn
 
+  tags = merge(var.tags, {
+    "Purpose" = "Organization Backup Vault"
+  })
+}
 
-  name                       = "organization-backup-policy"
-  backup_cron_schedule       = "cron(0 2 ? * 4 *)" # Every Thursday at 2:00 AM UTC
-  backup_selection_role_name = local.backup_selection_role
-  vault_name                 = local.backup_vault_name
-  backup_selection_tags = {
-    Backup = ["true"]
+resource "aws_kms_key" "backup_key" {
+  description             = "KMS key for backup vault encryption"
+  deletion_window_in_days = 7
+
+  tags = merge(var.tags, {
+    "Purpose" = "Backup Encryption Key"
+  })
+}
+
+resource "aws_kms_alias" "backup_key_alias" {
+  name          = "alias/backup-vault-key"
+  target_key_id = aws_kms_key.backup_key.key_id
+}
+
+#####
+# Create backup plan
+#####
+
+resource "aws_backup_plan" "organization_backup_plan" {
+  name = "organization-backup-policy"
+
+  rule {
+    rule_name         = "daily_backups"
+    target_vault_name = aws_backup_vault.organization_backup_vault.name
+    schedule          = "cron(0 2 ? * 4 *)" # Every Thursday at 2:00 AM UTC
+
+    lifecycle {
+      cold_storage_after = 30
+      delete_after       = 120
+    }
+
+    recovery_point_tags = merge(var.tags, {
+      "BackupPlan" = "organization-backup-policy"
+    })
   }
 
-  target_resource_region = var.region
-  secondary_vault_region = var.backup_region
+  tags = merge(var.tags, {
+    "Purpose" = "Organization Backup Plan"
+  })
+}
 
-  account_id    = aws_organizations_account.backups.id
-  parent_org_id = aws_organizations_organization.org.id
+#####
+# Create backup selection
+#####
+
+resource "aws_backup_selection" "organization_backup_selection" {
+  iam_role_arn = aws_iam_role.backup_selection_role.arn
+  name         = "organization-backup-selection"
+  plan_id      = aws_backup_plan.organization_backup_plan.id
+
+  selection_tag {
+    type  = "STRINGEQUALS"
+    key   = "Backup"
+    value = "true"
+  }
 
   depends_on = [
     aws_organizations_resource_policy.allow_delegated_backup_administrator
