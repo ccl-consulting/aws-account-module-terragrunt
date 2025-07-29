@@ -127,9 +127,13 @@ jobs:
         # Create simplified terragrunt.hcl for testing
         case "${{ matrix.example }}" in
           "simple-startup")
-            cat > terragrunt.hcl << 'EOF'
+            cat 8c8c 'EOF'
         terraform {
           source = "../."
+        }
+        
+        backend "local" {
+          path = "terraform.tfstate"
         }
         
         inputs = {
@@ -160,9 +164,13 @@ jobs:
         EOF
             ;;
           "development-environment")
-            cat > terragrunt.hcl << 'EOF'
+            cat 8c8c 'EOF'
         terraform {
           source = "../."
+        }
+        
+        backend "local" {
+          path = "terraform.tfstate"
         }
         
         inputs = {
@@ -198,6 +206,10 @@ jobs:
           source = "../."
         }
         
+        backend "local" {
+          path = "terraform.tfstate"
+        }
+        
         inputs = {
           region           = "us-east-1"
           backup_region    = "us-west-2"
@@ -229,6 +241,10 @@ jobs:
             cat > terragrunt.hcl << 'EOF'
         terraform {
           source = "../."
+        }
+        
+        backend "local" {
+          path = "terraform.tfstate"
         }
         
         inputs = {
