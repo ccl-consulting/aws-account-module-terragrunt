@@ -248,4 +248,4 @@ This is the initial release, so no breaking changes apply.
 
 **Full Changelog**: [View Changes](https://github.com/YOUR_GITHUB_USERNAME/aws-account-module-terragrunt/compare/...v1.0.0)
 
-Made with professional standards by [CCL Consulting](https://cclconsulting.com)
+Made with professional standards by [CCL Consulting](https://ccl-consulting.com)

@@ -5,7 +5,7 @@ For the purpose of example testing, the backend is set to be local. For producti
 # AWS Account Module - Terragrunt
 
 [![AWS Landing Zone](https://img.shields.io/badge/AWS-Landing%20Zone-orange?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/solutions/implementations/aws-landing-zone/)
-[![CCL Module](https://img.shields.io/badge/CCL-Consulting%20Module-blue?logo=terraform&logoColor=white)](https://cclconsulting.com)
+[![CCL Module](https://img.shields.io/badge/CCL-Consulting%20Module-blue?logo=terraform&logoColor=white)](https://ccl-consulting.com)
 [![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.2.0-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)
 [![Terragrunt](https://img.shields.io/badge/Terragrunt-%3E%3D0.50.0-326CE5?logo=terragrunt&logoColor=white)](https://terragrunt.gruntwork.io/)
 [![AWS Provider](https://img.shields.io/badge/AWS%20Provider-%3E%3D4.16-FF9900?logo=amazon-aws&logoColor=white)](https://registry.terraform.io/providers/hashicorp/aws/latest)
@@ -375,8 +375,8 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ### CCL Consulting Support
 
 - **Enterprise Support**: Contact our cloud architecture team
-- **Email**: [support@cclconsulting.com](mailto:support@cclconsulting.com)
-- **Website**: [cclconsulting.com](https://cclconsulting.com)
+- **Email**: [support@ccl-consulting.com](mailto:support@ccl-consulting.com)
+- **Website**: [ccl-consulting.com](https://ccl-consulting.com)
 
 ### Community Support
 
@@ -400,7 +400,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **If this module helped you, please consider giving it a star!**
 
-Made with care by [CCL Consulting](https://cclconsulting.com)
+Made with care by [CCL Consulting](https://ccl-consulting.com)
 
 </div>
 

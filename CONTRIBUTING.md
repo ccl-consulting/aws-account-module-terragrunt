@@ -367,8 +367,8 @@ Contributors will be recognized in the following ways:
 
 ### Communication Channels
 
-- **Website**: [cclconsulting.com](https://cclconsulting.com)
-- **Email**: [support@cclconsulting.com](mailto:support@cclconsulting.com)
+- **Website**: [ccl-consulting.com](https://ccl-consulting.com)
+- **Email**: [support@ccl-consulting.com](mailto:support@ccl-consulting.com)
 - **LinkedIn**: [CCL Consulting LinkedIn](https://linkedin.com/company/ccl-consulting)
 
 ---
