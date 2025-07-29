@@ -4,7 +4,6 @@ For the purpose of example testing, the backend is set to be local. For producti
 
 # AWS Account Module - Terragrunt
 
-
 [![AWS Landing Zone](https://img.shields.io/badge/AWS-Landing%20Zone-orange?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/solutions/implementations/aws-landing-zone/)
 [![CCL Module](https://img.shields.io/badge/CCL-Consulting%20Module-blue?logo=terraform&logoColor=white)](https://cclconsulting.com)
 [![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.2.0-623CE4?logo=terraform&logoColor=white)](https://www.terraform.io/)

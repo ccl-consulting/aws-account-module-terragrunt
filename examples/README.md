@@ -2,43 +2,43 @@
 
 This directory contains comprehensive Terragrunt configuration examples for deploying AWS Landing Zones using the CCL Consulting AWS Account Module. Each example is tailored for different organizational needs and deployment scenarios.
 
-## 📁 Available Examples
+## Available Examples
 
 ### 1. **Production Landing Zone** (`production-landing-zone.hcl`)
 **Use Case**: Large production environments with multiple business units
-- ✅ Multi-region Control Tower deployment
-- ✅ Comprehensive account structure (prod, staging, dev)
-- ✅ Extensive common services accounts
-- ✅ Enterprise-grade security and compliance tagging
-- ✅ Advanced remote state configuration with cross-region replication
-- ✅ Deployment hooks and validations
+- Multi-region Control Tower deployment
+- Comprehensive account structure (prod, staging, dev)
+- Extensive common services accounts
+- Enterprise-grade security and compliance tagging
+- Advanced remote state configuration with cross-region replication
+- Deployment hooks and validations
 
 ### 2. **Simple Startup** (`simple-startup.hcl`)
 **Use Case**: Small organizations or startups with minimal requirements
-- ✅ Single region deployment for cost optimization
-- ✅ Basic account structure (one account per environment)
-- ✅ Minimal common services
-- ✅ Cost-optimized configuration
-- ✅ Simple tagging strategy
+- Single region deployment for cost optimization
+- Basic account structure (one account per environment)
+- Minimal common services
+- Cost-optimized configuration
+- Simple tagging strategy
 
 ### 3. **Enterprise Multi-Region** (`enterprise-multi-region.hcl`)
 **Use Case**: Large enterprises with complex multi-region requirements
-- ✅ Global multi-region deployment (US, EU, APAC)
-- ✅ Business unit-based account organization
-- ✅ Extensive shared services portfolio
-- ✅ Comprehensive compliance and governance tagging
-- ✅ Advanced deployment automation and validation
-- ✅ Disaster recovery and business continuity features
+- Global multi-region deployment (US, EU, APAC)
+- Business unit-based account organization
+- Extensive shared services portfolio
+- Comprehensive compliance and governance tagging
+- Advanced deployment automation and validation
+- Disaster recovery and business continuity features
 
 ### 4. **Development Environment** (`development-environment.hcl`)
 **Use Case**: Development and testing environments
-- ✅ Cost-optimized configuration
-- ✅ Team-based development accounts
-- ✅ Auto-shutdown policies
-- ✅ Simplified monitoring and backup
-- ✅ Development-specific tagging and governance
+- Cost-optimized configuration
+- Team-based development accounts
+- Auto-shutdown policies
+- Simplified monitoring and backup
+- Development-specific tagging and governance
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -102,7 +102,7 @@ Before deploying any landing zone configuration, ensure you have:
    terragrunt apply
    ```
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 The landing zone module creates the following AWS resources:
 
@@ -139,7 +139,7 @@ Root Organization
 | **Workload** | Application and service accounts | Production, Staging, Development |
 | **Common Services** | Shared infrastructure services | Networking, DNS, Monitoring |
 
-## 📋 Configuration Reference
+## Configuration Reference
 
 ### Required Variables
 
@@ -170,7 +170,7 @@ Examples:
 - `aws+security@company.com`
 - `aws+logging@company.com`
 
-## 🔐 Security Best Practices
+## Security Best Practices
 
 ### 1. **Least Privilege Access**
 - Use specific IAM roles for Terragrunt execution
@@ -197,7 +197,7 @@ Examples:
 - Regular backup testing
 - Documented recovery procedures
 
-## 🏷️ Tagging Strategy
+## Tagging Strategy
 
 ### Required Tags
 - `Owner`: Resource owner
@@ -236,7 +236,7 @@ tags = {
 }
 ```
 
-## 🚨 Common Issues and Troubleshooting
+## Common Issues and Troubleshooting
 
 ### 1. **Control Tower Prerequisites**
 **Error**: Control Tower deployment fails
@@ -273,7 +273,7 @@ tags = {
 - Deploy in phases (core first, then workloads)
 - Use depends_on properly to manage resource order
 
-## 📚 Additional Resources
+## Additional Resources
 
 ### Documentation
 - [AWS Control Tower User Guide](https://docs.aws.amazon.com/controltower/)
@@ -289,7 +289,7 @@ tags = {
 - [AWS Account Setup Best Practices](https://aws.amazon.com/organizations/getting-started/best-practices/)
 - [Multi-Account Strategy](https://docs.aws.amazon.com/whitepapers/latest/organizing-your-aws-environment/)
 
-## 🤝 Contributing
+## Contributing
 
 To contribute new examples or improvements:
 
@@ -299,7 +299,7 @@ To contribute new examples or improvements:
 4. Update this README with new examples
 5. Submit a pull request with detailed description
 
-## 📞 Support
+## Support
 
 For questions and support:
 - **Technical Issues**: Create an issue in the repository
@@ -308,7 +308,7 @@ For questions and support:
 
 ---
 
-**⚠️ Important Notes:**
+**Important Notes:**
 - Always test configurations in a development environment first
 - Review all configurations before applying to production
 - Ensure you have proper backup and recovery procedures

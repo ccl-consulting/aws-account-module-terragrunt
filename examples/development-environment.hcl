@@ -151,17 +151,17 @@ terraform {
     commands = ["plan", "apply"]
     execute = [
       "bash", "-c", <<-EOT
-        echo "🚀 Deploying development landing zone..."
-        echo "💰 Cost optimization features enabled"
-        echo "⚠️  This is a development environment - not for production use"
+        echo "Deploying development landing zone..."
+        echo "Cost optimization features enabled"
+        echo "WARNING: This is a development environment - not for production use"
         
         # Check if we're in the right AWS account
         ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-        echo "📍 Deploying to AWS Account: $$ACCOUNT_ID"
+        echo "Deploying to AWS Account: $ACCOUNT_ID"
         
         # Warn about development limitations
         echo ""
-        echo "📋 Development Environment Limitations:"
+        echo "Development Environment Limitations:"
         echo "  • Limited to ${length(local.dev_regions)} regions"
         echo "  • Auto-shutdown policies will be applied"
         echo "  • Reduced backup retention periods"
@@ -175,27 +175,27 @@ terraform {
     commands = ["apply"]
     execute = [
       "bash", "-c", <<-EOT
-        echo "✅ Development landing zone deployed successfully!"
+        echo "Development landing zone deployed successfully!"
         echo ""
-        echo "📋 Development Environment Summary:"
+        echo "Development Environment Summary:"
         echo "  • ${length(local.dev_teams)} team development accounts created"
         echo "  • Staging and experimental accounts available"
         echo "  • Cost optimization policies applied"
         echo ""
-        echo "🔧 Next Steps for Development:"
+        echo "Next Steps for Development:"
         echo "  1. Set up development CI/CD pipelines"
         echo "  2. Configure development monitoring dashboards"
         echo "  3. Set up cost alerts and budgets"
         echo "  4. Configure auto-shutdown policies"
         echo "  5. Set up development access controls"
         echo ""
-        echo "💡 Development Best Practices:"
+        echo "Development Best Practices:"
         echo "  • Use spot instances where possible"
         echo "  • Enable auto-shutdown for non-critical resources"
         echo "  • Regular cleanup of unused resources"
         echo "  • Monitor costs daily"
         echo ""
-        echo "📞 Support: dev-team@ccl-consulting.com"
+        echo "Support: dev-team@ccl-consulting.com"
       EOT
     ]
   }

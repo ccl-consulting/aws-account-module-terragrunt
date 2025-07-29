@@ -272,26 +272,26 @@ terraform {
     commands = ["plan", "apply"]
     execute = [
       "bash", "-c", <<-EOT
-        echo "🔍 Validating enterprise landing zone prerequisites..."
+        echo "Validating enterprise landing zone prerequisites..."
         
         # Check if management account has necessary permissions
-        aws sts get-caller-identity || (echo "❌ AWS credentials not configured" && exit 1)
+        aws sts get-caller-identity || (echo "ERROR: AWS credentials not configured" && exit 1)
         
         # Validate email domain
         if [[ "${local.email_domain}" == "enterprise.com" ]]; then
-          echo "⚠️  Please update email_domain with your actual domain"
+          echo "WARNING: Please update email_domain with your actual domain"
         fi
         
         # Check for required environment variables
         required_vars=("TF_VAR_email_domain")
-        for var in "$${required_vars[@]}"; do
-          if [[ -z "$${!var}" ]]; then
-            echo "❌ Required environment variable $$var is not set"
+        for var in "${required_vars[@]}"; do
+          if [[ -z "${!var}" ]]; then
+            echo "ERROR: Required environment variable $var is not set"
             exit 1
           fi
         done
         
-        echo "✅ Prerequisites validation completed"
+        echo "Prerequisites validation completed"
       EOT
     ]
   }
@@ -301,23 +301,23 @@ terraform {
     commands = ["apply"]
     execute = [
       "bash", "-c", <<-EOT
-        echo "🎉 Enterprise landing zone deployment completed!"
+        echo "Enterprise landing zone deployment completed!"
         echo ""
-        echo "📋 Deployment Summary:"
+        echo "Deployment Summary:"
         echo "  • Organization created with ${length(local.all_prod_accounts) + length(local.all_staging_accounts) + length(local.all_dev_accounts)} workload accounts"
         echo "  • ${length(inputs.org_accounts.common_services)} common service accounts provisioned"
         echo "  • Control Tower enabled in ${length(inputs.governed_regions)} regions"
         echo "  • Backup policies configured for cross-region protection"
         echo ""
-        echo "🔗 Next Steps:"
+        echo "Next Steps:"
         echo "  1. Configure AWS SSO/Identity Center"
         echo "  2. Set up network connectivity (Transit Gateway, VPN)"
         echo "  3. Deploy security baselines to all accounts"
         echo "  4. Configure monitoring and alerting"
         echo "  5. Set up CI/CD pipelines for workload deployments"
         echo ""
-        echo "📚 Documentation: https://docs.enterprise.com/aws-landing-zone"
-        echo "🎫 Support: cloud-platform-team@enterprise.com"
+        echo "Documentation: https://docs.enterprise.com/aws-landing-zone"
+        echo "Support: cloud-platform-team@enterprise.com"
       EOT
     ]
   }
@@ -327,9 +327,9 @@ terraform {
     commands = ["plan", "apply"]
     execute = [
       "bash", "-c", <<-EOT
-        echo "❌ Landing zone deployment failed!"
-        echo "📞 Contact: cloud-platform-team@enterprise.com"
-        echo "📖 Troubleshooting: https://docs.enterprise.com/aws-landing-zone/troubleshooting"
+        echo "ERROR: Landing zone deployment failed!"
+        echo "Contact: cloud-platform-team@enterprise.com"
+        echo "Troubleshooting: https://docs.enterprise.com/aws-landing-zone/troubleshooting"
       EOT
     ]
   }
