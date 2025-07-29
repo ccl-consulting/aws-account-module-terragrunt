@@ -54,13 +54,9 @@ EOF
 
 # Development remote state (simpler configuration)
 remote_state {
-  backend = "s3"
+  backend = "local"
   config = {
-    bucket         = "dev-terraform-state-${local.environment}"
-    key            = "landing-zone/dev/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "terraform-locks-dev"
+    path = "terraform.tfstate"
   }
 }
 

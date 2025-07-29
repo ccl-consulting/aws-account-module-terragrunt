@@ -1,3 +1,7 @@
+## Backend Configuration
+
+For the purpose of example testing, the backend is set to be local. For production, it's advised to switch to a remote backend like S3 for better state management.
+
 # AWS Account Module - Terragrunt
 
 

@@ -30,27 +30,9 @@ EOF
 }
 
 remote_state {
-  backend = "s3"
-  generate = {
-    path      = "backend.tf"
-    if_exists = "overwrite"
-  }
+  backend = "local"
   config = {
-    bucket         = "your-terraform-state-bucket"
-    key            = "landing-zone/production/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "terraform-locks"
-    versioning     = true
-    
-    server_side_encryption_configuration {
-      rule {
-        apply_server_side_encryption_by_default {
-          kms_master_key_id = "arn:aws:kms:us-east-1:ACCOUNT-ID:key/KEY-ID"
-          sse_algorithm     = "aws:kms"
-        }
-      }
-    }
+    path = "terraform.tfstate"
   }
 }
 

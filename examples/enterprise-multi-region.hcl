@@ -114,49 +114,9 @@ EOF
 
 # Enhanced remote state with cross-region replication
 remote_state {
-  backend = "s3"
-  generate = {
-    path      = "backend.tf"
-    if_exists = "overwrite"
-  }
+  backend = "local"
   config = {
-    bucket         = "enterprise-terraform-state-${local.primary_region}"
-    key            = "landing-zone/${local.environment}/terraform.tfstate"
-    region         = local.primary_region
-    encrypt        = true
-    dynamodb_table = "terraform-state-locks-${local.environment}"
-    
-    # Enhanced security and compliance
-    versioning = true
-    
-    # Server-side encryption with customer-managed KMS key
-    server_side_encryption_configuration {
-      rule {
-        apply_server_side_encryption_by_default {
-          kms_master_key_id = "arn:aws:kms:${local.primary_region}:ACCOUNT-ID:key/KEY-ID"
-          sse_algorithm     = "aws:kms"
-        }
-      }
-    }
-    
-    # Cross-region replication for disaster recovery
-    replication_configuration {
-      role = "arn:aws:iam::ACCOUNT-ID:role/terraform-state-replication-role"
-      
-      rules {
-        id     = "enterprise-state-replication"
-        status = "Enabled"
-        
-        destination {
-          bucket        = "enterprise-terraform-state-backup-${local.secondary_region}"
-          storage_class = "STANDARD_IA"
-          
-          encryption_configuration {
-            replica_kms_key_id = "arn:aws:kms:${local.secondary_region}:ACCOUNT-ID:key/KEY-ID"
-          }
-        }
-      }
-    }
+    path = "terraform.tfstate"
   }
 }
 
