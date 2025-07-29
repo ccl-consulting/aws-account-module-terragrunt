@@ -127,7 +127,7 @@ jobs:
         # Create simplified terragrunt.hcl for testing
         case "${{ matrix.example }}" in
           "simple-startup")
-            cat 8c8c 'EOF'
+            cat > terragrunt.hcl << 'EOF'
         terraform {
           source = "../."
         }
@@ -164,7 +164,7 @@ jobs:
         EOF
             ;;
           "development-environment")
-            cat 8c8c 'EOF'
+            cat > terragrunt.hcl << 'EOF'
         terraform {
           source = "../."
         }
