@@ -1,34 +1,21 @@
-resource "aws_organizations_organization" "org" {
-  aws_service_access_principals = [
-    "backup.amazonaws.com",
-    "cloudtrail.amazonaws.com",
-    "sso.amazonaws.com"
-  ]
-
-  enabled_policy_types = ["BACKUP_POLICY"]
-
-  feature_set = "ALL"
-
-  lifecycle {
-    ignore_changes = [aws_service_access_principals, enabled_policy_types]
-  }
-}
+# Use existing organization instead of creating a new one
+data "aws_organizations_organization" "org" {}
 
 ## OU
 
 resource "aws_organizations_organizational_unit" "suspended" {
   name      = "Suspended"
-  parent_id = aws_organizations_organization.org.roots[0].id
+  parent_id = data.aws_organizations_organization.org.roots[0].id
 }
 
 resource "aws_organizations_organizational_unit" "common_services" {
   name      = "Common Services"
-  parent_id = aws_organizations_organization.org.roots[0].id
+  parent_id = data.aws_organizations_organization.org.roots[0].id
 }
 
 resource "aws_organizations_organizational_unit" "workloads" {
   name      = "Workloads"
-  parent_id = aws_organizations_organization.org.roots[0].id
+  parent_id = data.aws_organizations_organization.org.roots[0].id
 }
 
 resource "aws_organizations_organizational_unit" "workloads_prod" {
@@ -51,7 +38,7 @@ resource "aws_organizations_organizational_unit" "workloads_dev" {
 resource "aws_organizations_account" "logging" {
   name      = "Logging"
   email     = "${var.email_local_part}+logging@${var.email_domain}"
-  parent_id = aws_organizations_organization.org.roots[0].id
+  parent_id = data.aws_organizations_organization.org.roots[0].id
 
   close_on_deletion = true
 
@@ -63,7 +50,7 @@ resource "aws_organizations_account" "logging" {
 resource "aws_organizations_account" "security" {
   name      = "Security"
   email     = "${var.email_local_part}+security@${var.email_domain}"
-  parent_id = aws_organizations_organization.org.roots[0].id
+  parent_id = data.aws_organizations_organization.org.roots[0].id
 
   close_on_deletion = true
 
