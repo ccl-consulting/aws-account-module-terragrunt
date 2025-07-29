@@ -150,9 +150,11 @@ locals {
 }
 
 output "all_accounts" {
-  value = local.all_accounts
+  description = "List of all AWS organization accounts created by this module"
+  value       = local.all_accounts
 }
 
 output "workload_accounts" {
-  value = local.workload_accounts
+  description = "List of workload accounts (production, staging, development)"
+  value       = local.workload_accounts
 }

@@ -124,6 +124,7 @@ resource "aws_backup_vault" "organization_backup_vault" {
 
   tags = merge(var.tags, {
     "Purpose" = "Organization Backup Vault"
+    "Region"  = var.region
   })
 }
 

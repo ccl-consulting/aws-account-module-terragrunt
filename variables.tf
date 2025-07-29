@@ -27,6 +27,7 @@ variable "tags" {
 }
 
 variable "org_accounts" {
+  description = "Organization account structure defining workload and common service accounts"
   type = object({
     workloads = object({
       prod    = list(string)
