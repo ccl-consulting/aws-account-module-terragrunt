@@ -132,8 +132,11 @@ jobs:
           source = "../."
         }
         
-        backend "local" {
-          path = "terraform.tfstate"
+        remote_state {
+          backend = "local"
+          config = {
+            path = "terraform.tfstate"
+          }
         }
         
         inputs = {
@@ -169,8 +172,11 @@ jobs:
           source = "../."
         }
         
-        backend "local" {
-          path = "terraform.tfstate"
+        remote_state {
+          backend = "local"
+          config = {
+            path = "terraform.tfstate"
+          }
         }
         
         inputs = {
@@ -206,8 +212,11 @@ jobs:
           source = "../."
         }
         
-        backend "local" {
-          path = "terraform.tfstate"
+        remote_state {
+          backend = "local"
+          config = {
+            path = "terraform.tfstate"
+          }
         }
         
         inputs = {
@@ -243,8 +252,11 @@ jobs:
           source = "../."
         }
         
-        backend "local" {
-          path = "terraform.tfstate"
+        remote_state {
+          backend = "local"
+          config = {
+            path = "terraform.tfstate"
+          }
         }
         
         inputs = {
