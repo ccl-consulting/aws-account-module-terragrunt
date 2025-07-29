@@ -99,10 +99,10 @@ jobs:
     strategy:
       matrix:
         example: 
-          - "examples/development-environment.hcl"
-          - "examples/enterprise-multi-region.hcl"
-          - "examples/production-landing-zone.hcl"
-          - "examples/simple-startup.hcl"
+          - "development-environment.hcl"
+          - "enterprise-multi-region.hcl"
+          - "production-landing-zone.hcl"
+          - "simple-startup.hcl"
           
 
     steps:
