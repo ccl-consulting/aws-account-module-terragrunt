@@ -137,7 +137,7 @@ resource "aws_controltower_landing_zone" "zone" {
   version       = "3.3"
 
   depends_on = [
-    aws_organizations_organization.org,
+    data.aws_organizations_organization.org,
     aws_iam_role.control_tower_admin,
     aws_iam_role.control_tower_cloudtrail_role,
     aws_iam_role.control_tower_config_aggregator_role_for_organizations,

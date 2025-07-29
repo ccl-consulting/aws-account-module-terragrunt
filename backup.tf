@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "organization_backup_policy" {
       "organizations:UpdatePolicy",
       "organizations:DeletePolicy"
     ]
-    resources = ["arn:aws:organizations::${aws_organizations_organization.org.master_account_id}:policy/*/backup_policy/*", ]
+    resources = ["arn:aws:organizations::${data.aws_organizations_organization.org.master_account_id}:policy/*/backup_policy/*", ]
     principals {
       identifiers = [aws_organizations_account.backups.id]
       type        = "AWS"
@@ -67,10 +67,10 @@ data "aws_iam_policy_document" "organization_backup_policy" {
       "organizations:DetachPolicy"
     ]
     resources = [
-      "arn:aws:organizations::${aws_organizations_organization.org.master_account_id}:root/*",
-      "arn:aws:organizations::${aws_organizations_organization.org.master_account_id}:ou/*",
-      "arn:aws:organizations::${aws_organizations_organization.org.master_account_id}:account/*",
-      "arn:aws:organizations::${aws_organizations_organization.org.master_account_id}:policy/*/backup_policy/*"
+      "arn:aws:organizations::${data.aws_organizations_organization.org.master_account_id}:root/*",
+      "arn:aws:organizations::${data.aws_organizations_organization.org.master_account_id}:ou/*",
+      "arn:aws:organizations::${data.aws_organizations_organization.org.master_account_id}:account/*",
+      "arn:aws:organizations::${data.aws_organizations_organization.org.master_account_id}:policy/*/backup_policy/*"
     ]
     principals {
       identifiers = [aws_organizations_account.backups.id]
