@@ -375,7 +375,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ### CCL Consulting Support
 
 - **Enterprise Support**: Contact our cloud architecture team
-- **Email**: [support@ccl-consulting.com](mailto:support@ccl-consulting.com)
+- **Email**: [rsinien@ccl-consulting.com](mailto:rsinien@ccl-consulting.com)
 - **Website**: [ccl-consulting.com](https://ccl-consulting.com)
 
 ### Community Support
