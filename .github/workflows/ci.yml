@@ -99,10 +99,11 @@ jobs:
     strategy:
       matrix:
         example: 
-          - "examples/development-environment"
-          - "examples/enterprise-multi-region"
-          - "examples/production-landing-zone"
-          - "examples/simple-startup"
+          - "examples/development-environment.hcl"
+          - "examples/enterprise-multi-region.hcl"
+          - "examples/production-landing-zone.hcl"
+          - "examples/simple-startup.hcl"
+          
 
     steps:
     - name: Checkout Code
