@@ -11,7 +11,7 @@ plugin "terraform" {
 
 config {
   # Enable module inspection
-  module = true
+  call_module_type = "all"
   
   # Disable color output for CI
   force = false
