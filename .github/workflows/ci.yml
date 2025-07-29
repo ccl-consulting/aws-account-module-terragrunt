@@ -122,14 +122,32 @@ jobs:
 
     - name: Test Example Configuration - ${{ matrix.example }}
       run: |
-        # Create a temporary terragrunt.hcl using the example
-        cp examples/${{ matrix.example }}.hcl test-terragrunt.hcl
+        # Create test directory for this example
+        mkdir -p test-${{ matrix.example }}
+        cd test-${{ matrix.example }}
         
-        # Validate the example configuration
-        terragrunt validate --terragrunt-config-path test-terragrunt.hcl --terragrunt-working-dir .
+        # Create terragrunt.hcl that points to local module instead of remote
+        cat > terragrunt.hcl << 'EOF'
+        terraform {
+          source = "../."
+        }
         
-        # Plan without applying (dry run)
-        terragrunt plan --terragrunt-config-path test-terragrunt.hcl --terragrunt-working-dir . || echo "Plan completed with warnings (expected for examples)"
+        # Copy inputs from the example but remove the remote source
+        inputs = {
+        EOF
+        
+        # Extract inputs from the example file and append to terragrunt.hcl
+        sed -n '/inputs = {/,/}/p' ../examples/${{ matrix.example }}.hcl | tail -n +2 >> terragrunt.hcl
+        
+        echo "Validating example: ${{ matrix.example }}"
+        echo "Generated terragrunt.hcl:"
+        cat terragrunt.hcl
+        
+        # Initialize and validate (without planning due to missing AWS credentials)
+        terragrunt init --terragrunt-non-interactive
+        terragrunt validate --terragrunt-non-interactive
+        
+        echo "Example ${{ matrix.example }} validation completed successfully"
 
   release:
     name: Create Release
