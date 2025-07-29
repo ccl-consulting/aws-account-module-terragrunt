@@ -294,6 +294,7 @@ jobs:
         
         # Copy module files to avoid backend conflicts
         cp -r ../*.tf .
+        cp -r ../template . 2>/dev/null || true
         cp -r ../modules . 2>/dev/null || true
         
         # Remove backend configuration for testing
