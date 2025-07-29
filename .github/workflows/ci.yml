@@ -99,11 +99,11 @@ jobs:
     strategy:
       matrix:
         example: 
-          - development-environment
-          - enterprise-multi-region
-          - production-landing-zone
-          - simple-startup
-    
+          - "examples/development-environment"
+          - "examples/enterprise-multi-region"
+          - "examples/production-landing-zone"
+          - "examples/simple-startup"
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
