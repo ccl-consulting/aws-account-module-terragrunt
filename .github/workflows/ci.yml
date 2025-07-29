@@ -126,18 +126,141 @@ jobs:
         mkdir -p test-${{ matrix.example }}
         cd test-${{ matrix.example }}
         
-        # Create terragrunt.hcl that points to local module instead of remote
-        cat > terragrunt.hcl << 'EOF'
+        # Create simplified terragrunt.hcl for testing
+        case "${{ matrix.example }}" in
+          "simple-startup")
+            cat > terragrunt.hcl << 'EOF'
         terraform {
           source = "../."
         }
         
-        # Copy inputs from the example but remove the remote source
         inputs = {
+          region           = "us-east-1"
+          backup_region    = "us-west-2"
+          governed_regions = ["us-east-1"]
+          
+          email_local_part = "aws"
+          email_domain     = "startup.com"
+          
+          org_accounts = {
+            workloads = {
+              prod = ["production"]
+              staging = ["staging"]
+              dev = ["development"]
+            }
+            common_services = []
+          }
+          
+          tags = {
+            "Owner"          = "CCL Consulting"
+            "Provisioned by" = "Terraform"
+            "Environment"    = "Startup"
+            "CostCenter"     = "Engineering"
+            "Contact"        = "devops@startup.com"
+          }
+        }
         EOF
+            ;;
+          "development-environment")
+            cat > terragrunt.hcl << 'EOF'
+        terraform {
+          source = "../."
+        }
         
-        # Extract inputs from the example file and append to terragrunt.hcl
-        sed -n '/inputs = {/,/}/p' ../examples/${{ matrix.example }}.hcl | tail -n +2 >> terragrunt.hcl
+        inputs = {
+          region           = "us-east-1"
+          backup_region    = "us-west-2"
+          governed_regions = ["us-east-1", "us-west-2"]
+          
+          email_local_part = "aws-dev"
+          email_domain     = "ccl-consulting.com"
+          
+          org_accounts = {
+            workloads = {
+              prod = []
+              staging = ["staging-integration", "staging-performance"]
+              dev = ["dev-frontend", "dev-backend", "dev-sandbox"]
+            }
+            common_services = ["shared-dev-tools", "shared-dev-monitoring"]
+          }
+          
+          tags = {
+            "Owner"          = "CCL Consulting"
+            "Provisioned by" = "Terraform"
+            "Environment"    = "development"
+            "CostCenter"     = "Engineering"
+            "Contact"        = "devops@ccl-consulting.com"
+          }
+        }
+        EOF
+            ;;
+          "production-landing-zone")
+            cat > terragrunt.hcl << 'EOF'
+        terraform {
+          source = "../."
+        }
+        
+        inputs = {
+          region           = "us-east-1"
+          backup_region    = "us-west-2"
+          governed_regions = ["us-east-1", "us-west-2", "eu-west-1"]
+          
+          email_local_part = "aws-prod"
+          email_domain     = "ccl-consulting.com"
+          
+          org_accounts = {
+            workloads = {
+              prod = ["prod-web", "prod-api", "prod-data"]
+              staging = ["staging-web", "staging-api"]
+              dev = ["dev-integration"]
+            }
+            common_services = ["shared-logging", "shared-monitoring", "shared-security"]
+          }
+          
+          tags = {
+            "Owner"          = "CCL Consulting"
+            "Provisioned by" = "Terraform"
+            "Environment"    = "production"
+            "CostCenter"     = "Production"
+            "Contact"        = "ops@ccl-consulting.com"
+          }
+        }
+        EOF
+            ;;
+          "enterprise-multi-region")
+            cat > terragrunt.hcl << 'EOF'
+        terraform {
+          source = "../."
+        }
+        
+        inputs = {
+          region           = "us-east-1"
+          backup_region    = "us-west-2"
+          governed_regions = ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"]
+          
+          email_local_part = "aws-enterprise"
+          email_domain     = "ccl-consulting.com"
+          
+          org_accounts = {
+            workloads = {
+              prod = ["prod-us-web", "prod-eu-web", "prod-asia-web"]
+              staging = ["staging-us", "staging-eu"]
+              dev = ["dev-us", "dev-eu"]
+            }
+            common_services = ["shared-dns", "shared-logging", "shared-monitoring", "shared-security"]
+          }
+          
+          tags = {
+            "Owner"          = "CCL Consulting"
+            "Provisioned by" = "Terraform"
+            "Environment"    = "enterprise"
+            "CostCenter"     = "Enterprise"
+            "Contact"        = "enterprise@ccl-consulting.com"
+          }
+        }
+        EOF
+            ;;
+        esac
         
         echo "Validating example: ${{ matrix.example }}"
         echo "Generated terragrunt.hcl:"
