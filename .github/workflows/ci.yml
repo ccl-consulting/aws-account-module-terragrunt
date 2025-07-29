@@ -309,53 +309,153 @@ jobs:
   release:
     name: Create Release
     runs-on: ubuntu-latest
-    if: github.event_name == 'release'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: [validate, security-scan, test-examples]
     
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: ${{ env.TF_VERSION }}
 
+    - name: Determine Version
+      id: version
+      run: |
+        # Get the latest tag
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        echo "Latest tag: $LATEST_TAG"
+        
+        # Extract version numbers
+        MAJOR=$(echo $LATEST_TAG | sed 's/v//' | cut -d. -f1)
+        MINOR=$(echo $LATEST_TAG | sed 's/v//' | cut -d. -f2)
+        PATCH=$(echo $LATEST_TAG | sed 's/v//' | cut -d. -f3)
+        
+        # Check commit messages since last tag for version bump
+        COMMITS=$(git log ${LATEST_TAG}..HEAD --pretty=format:"%s" 2>/dev/null || git log --pretty=format:"%s")
+        
+        # Determine version bump based on commit messages
+        if echo "$COMMITS" | grep -E "^(feat|feature)" > /dev/null; then
+          MINOR=$((MINOR + 1))
+          PATCH=0
+        elif echo "$COMMITS" | grep -E "^(fix|bugfix|hotfix)" > /dev/null; then
+          PATCH=$((PATCH + 1))
+        elif echo "$COMMITS" | grep -E "BREAKING CHANGE" > /dev/null; then
+          MAJOR=$((MAJOR + 1))
+          MINOR=0
+          PATCH=0
+        else
+          PATCH=$((PATCH + 1))
+        fi
+        
+        NEW_VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+        echo "New version: $NEW_VERSION"
+        echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "major=$MAJOR" >> $GITHUB_OUTPUT
+        echo "minor=$MINOR" >> $GITHUB_OUTPUT
+        echo "patch=$PATCH" >> $GITHUB_OUTPUT
+
     - name: Generate Release Notes
       run: |
-        echo "## What's New" > release-notes.md
-        echo "" >> release-notes.md
-        echo "This release includes:" >> release-notes.md
-        echo "- Validated Terraform configurations" >> release-notes.md
-        echo "- Security scan passed" >> release-notes.md
-        echo "- Linting completed" >> release-notes.md
-        echo "- Example configurations tested" >> release-notes.md
-        echo "" >> release-notes.md
-        echo "## Compatibility" >> release-notes.md
-        echo "- **Terraform**: >= ${{ env.TF_VERSION }}" >> release-notes.md
-        echo "- **Terragrunt**: >= ${{ env.TERRAGRUNT_VERSION }}" >> release-notes.md
-        echo "- **AWS Provider**: >= 4.16" >> release-notes.md
-        echo "" >> release-notes.md
-        echo "## Installation" >> release-notes.md
-        echo '```hcl' >> release-notes.md
-        echo 'terraform {' >> release-notes.md
-        echo '  source = "git::https://github.com/${{ github.repository }}.git///?ref=${{ github.event.release.tag_name }}"' >> release-notes.md
-        echo '}' >> release-notes.md
-        echo '```' >> release-notes.md
+        cat > release-notes.md << 'EOF'
+        ## AWS Account Module Terragrunt ${{ steps.version.outputs.version }}
+        
+        ### What's New
+        
+        This release includes:
+        - Validated Terraform configurations
+        - Security scan passed with Checkov
+        - Code quality checks with TFLint
+        - Example configurations tested
+        - Professional documentation standards
+        
+        ### Key Features
+        
+        - **AWS Control Tower Integration** - Automated Landing Zone deployment
+        - **Multi-Account Architecture** - Secure account isolation
+        - **Multi-Region Support** - Deploy across multiple regions
+        - **Security by Design** - Built-in security controls
+        - **Comprehensive Examples** - Production-ready configurations
+        
+        ### Technical Specifications
+        
+        - **Terraform**: >= ${{ env.TF_VERSION }}
+        - **Terragrunt**: >= ${{ env.TERRAGRUNT_VERSION }}
+        - **AWS Provider**: >= 4.16.0
+        
+        ### Installation
+        
+        ```hcl
+        terraform {
+          source = "git::https://github.com/${{ github.repository }}.git?ref=${{ steps.version.outputs.version }}"
+        }
+        ```
+        
+        ### Example Usage
+        
+        ```hcl
+        inputs = {
+          email_domain = "your-company.com"
+          region       = "us-east-1"
+          
+          org_accounts = {
+            workloads = {
+              prod    = ["production-web", "production-api"]
+              staging = ["staging-web", "staging-api"]
+              dev     = ["development"]
+            }
+            common_services = ["shared-services", "monitoring"]
+          }
+        }
+        ```
+        
+        ### Changes Since Last Release
+        
+        $(git log $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~10")..HEAD --pretty=format:"- %s" 2>/dev/null || echo "- Initial release")
+        
+        ### Support
+        
+        - **Issues**: [GitHub Issues](https://github.com/${{ github.repository }}/issues)
+        - **Documentation**: [README](https://github.com/${{ github.repository }}/blob/main/README.md)
+        - **Examples**: [Examples Directory](https://github.com/${{ github.repository }}/tree/main/examples)
+        
+        Made with professional standards by CCL Consulting
+        EOF
 
-    - name: Update Release
+    - name: Create Release
       uses: actions/github-script@v7
       with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         script: |
           const fs = require('fs');
           const releaseNotes = fs.readFileSync('release-notes.md', 'utf8');
           
-          await github.rest.repos.updateRelease({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            release_id: context.payload.release.id,
-            body: releaseNotes
-          });
+          try {
+            const release = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: '${{ steps.version.outputs.version }}',
+              name: 'Release ${{ steps.version.outputs.version }}',
+              body: releaseNotes,
+              draft: false,
+              prerelease: false,
+              generate_release_notes: false
+            });
+            
+            console.log(`Release created: ${release.data.html_url}`);
+            core.summary.addHeading('Release Created Successfully');
+            core.summary.addLink('View Release', release.data.html_url);
+            core.summary.addCodeBlock(`Version: ${{ steps.version.outputs.version }}`, 'text');
+            await core.summary.write();
+          } catch (error) {
+            console.error('Error creating release:', error);
+            core.setFailed(`Failed to create release: ${error.message}`);
+          }
 
   notify:
     name: Notification
