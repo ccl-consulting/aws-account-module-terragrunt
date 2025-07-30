@@ -6,7 +6,7 @@ resource "aws_organizations_service_access" "backup" {
 resource "aws_organizations_delegated_administrator" "backups" {
   account_id        = aws_organizations_account.backups.id
   service_principal = "backup.amazonaws.com"
-  
+
   depends_on = [aws_organizations_service_access.backup]
 }
 
@@ -56,7 +56,7 @@ data "aws_iam_policy_document" "organization_backup_policy" {
       "organizations:UpdatePolicy",
       "organizations:DeletePolicy"
     ]
-    resources = ["arn:aws:organizations::${data.aws_organizations_organization.org.master_account_id}:policy/*/backup_policy/*", ]
+    resources = ["arn:aws:organizations::${data.aws_organizations_organization.org.master_account_id}:policy/*/backup_policy/*"]
     principals {
       identifiers = [aws_organizations_account.backups.id]
       type        = "AWS"
