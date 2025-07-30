@@ -1,6 +1,13 @@
+# Enable AWS service access for backup service first
+resource "aws_organizations_service_access" "backup" {
+  service_principal = "backup.amazonaws.com"
+}
+
 resource "aws_organizations_delegated_administrator" "backups" {
   account_id        = aws_organizations_account.backups.id
   service_principal = "backup.amazonaws.com"
+  
+  depends_on = [aws_organizations_service_access.backup]
 }
 
 resource "aws_backup_global_settings" "cross_account_backup" {
