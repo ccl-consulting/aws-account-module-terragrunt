@@ -162,13 +162,13 @@ Root Organization
 
 Accounts are created with emails in the format:
 ```
-{email_local_part}+{account-name}@{email_domain}
+{email_local_part}_{account-name}@{email_domain}
 ```
 
 Examples:
-- `aws+prod-web-services@company.com`
-- `aws+security@company.com`
-- `aws+logging@company.com`
+- `aws_prod-web-services@company.com`
+- `aws_security@company.com`
+- `aws_logging@company.com`
 
 ## Security Best Practices
 

@@ -46,14 +46,14 @@ variable "org_accounts" {
   }
 }
 
-# Emails will use the following format: email_local_part+${account_name}@email_domain to redirect every mail to a single mailbox.
+# Emails will use the following format: email_local_part_${account_name}@email_domain to redirect every mail to a single mailbox.
 variable "email_local_part" {
   description = "The local part of the email address used for the organization accounts."
   type        = string
   default     = "aws"
 }
 
-# Emails will use the following format: email_local_part+${account_name}@email_domain to redirect every mail to a single mailbox.
+# Emails will use the following format: email_local_part_${account_name}@email_domain to redirect every mail to a single mailbox.
 variable "email_domain" {
   description = "The domain part of the email address used for the organization accounts."
   type        = string

@@ -125,8 +125,8 @@ Root Organization
 
 #### Email Configuration
 - Supports `+` addressing for account emails
-- Format: `{email_local_part}+{account-name}@{email_domain}`
-- Example: `aws+production-web@company.com`
+- Format: `{email_local_part}_{account-name}@{email_domain}`
+- Example: `aws_production-web@company.com`
 
 ###  Security Features
 

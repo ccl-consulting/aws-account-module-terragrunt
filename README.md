@@ -146,12 +146,12 @@ graph TB
 
 ### Email Configuration
 
-Accounts are created using the format: `{email_local_part}+{account-name}@{email_domain}`
+Accounts are created using the format: `{email_local_part}_{account-name}@{email_domain}`
 
 **Examples:**
-- `aws+production-web@company.com`
-- `aws+security@company.com`
-- `aws+logging@company.com`
+- `aws_production-web@company.com`
+- `aws_security@company.com`
+- `aws_logging@company.com`
 
 ## Examples
 

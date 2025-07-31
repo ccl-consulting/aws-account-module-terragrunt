@@ -128,7 +128,7 @@ This repository implements the following branch protection rules:
      for_each = local.all_workload_accounts
      
      name      = each.value.name
-     email     = "${var.email_local_part}+${each.value.name}@${var.email_domain}"
+     email     = "${var.email_local_part}_${each.value.name}@${var.email_domain}"
      parent_id = each.value.ou_id
      
      tags = merge(var.tags, {
