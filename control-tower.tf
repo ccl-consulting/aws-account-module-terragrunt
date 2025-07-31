@@ -17,20 +17,6 @@ data "aws_iam_policy_document" "control_tower_admin" {
   }
 }
 
-resource "aws_iam_role_policy" "control_tower_admin_policy" {
-  name   = "AWSControlTowerAdminPolicy"
-  role   = aws_iam_role.control_tower_admin.id
-  policy = data.aws_iam_policy_document.control_tower_admin_policy_content.json
-}
-
-data "aws_iam_policy_document" "control_tower_admin_policy_content" {
-  statement {
-    effect    = "Allow"
-    actions   = ["ec2:Describe*"]
-    resources = ["*"]
-  }
-}
-
 resource "aws_iam_role_policy_attachment" "control_tower_service_role_policy" {
   role       = aws_iam_role.control_tower_admin.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSControlTowerServiceRolePolicy"
