@@ -88,3 +88,4 @@ release-notes.md
 # Temporary files
 tmp/
 temp/
+.kiro/*
