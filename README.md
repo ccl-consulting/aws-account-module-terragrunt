@@ -509,7 +509,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **If this module helped you, please consider giving it a star!**
 
 Made with care by [CCL Consulting](https://ccl-consulting.fr)
-Contact [Rahma Sinien](rahma@ccl-consulting.fr)
+Contact [Rahma Sinien](rsinien@ccl-consulting.fr)
 
 </div>
 
