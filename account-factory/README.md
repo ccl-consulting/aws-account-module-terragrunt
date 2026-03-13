@@ -20,11 +20,11 @@ The Account Factory uses AWS CloudFormation StackSets to deploy baselines across
 
 ### Architecture Overview
 
-![Account Factory Architecture](../generated-diagrams/account-factory-architecture.png)
+![Account Factory Architecture](../diagrams/account-factory-architecture.png)
 
 ### Deployment Flow
 
-![Account Factory Deployment Flow](../generated-diagrams/account-factory-flow.png)
+![Account Factory Deployment Flow](../diagrams/account-factory-flow.png)
 
 The deployment process follows these steps:
 

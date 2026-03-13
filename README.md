@@ -32,55 +32,15 @@ This Terragrunt module provides a complete solution for establishing an AWS Land
 
 ## Architecture
 
-```mermaid
-graph TB
-    subgraph "AWS Organization"
-        ROOT[Management Account]
-        
-        subgraph "Security OU"
-            SEC[Security Account]
-            LOG[Logging Account]
-        end
-        
-        subgraph "Common Services OU"
-            BACKUP[Backup Account]
-            SHARED[Shared Services]
-        end
-        
-        subgraph "Workloads OU"
-            subgraph "Production OU"
-                PROD1[Production App 1]
-                PROD2[Production App 2]
-            end
-            
-            subgraph "Staging OU"
-                STAGE1[Staging App 1]
-                STAGE2[Staging App 2]
-            end
-            
-            subgraph "Development OU"
-                DEV1[Development App 1]
-                DEV2[Development App 2]
-            end
-        end
-        
-        subgraph "Suspended OU"
-            SUSP[Suspended Accounts]
-        end
-    end
-    
-    ROOT --> SEC
-    ROOT --> LOG
-    ROOT --> BACKUP
-    ROOT --> SHARED
-    ROOT --> PROD1
-    ROOT --> PROD2
-    ROOT --> STAGE1
-    ROOT --> STAGE2
-    ROOT --> DEV1
-    ROOT --> DEV2
-    ROOT --> SUSP
-```
+![AWS Organization Architecture](diagrams/aws-organization-architecture.png)
+
+The architecture implements a hierarchical AWS Organization structure with:
+
+- **Management Account** - Central governance and billing
+- **Security OU** - Dedicated security and logging accounts
+- **Common Services OU** - Shared infrastructure and backup services
+- **Workloads OU** - Application accounts organized by environment (Production, Staging, Development)
+- **Suspended OU** - Isolated accounts pending decommission
 
 ## Quick Start
 
