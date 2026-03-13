@@ -1,0 +1,741 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Network Baseline StackSet Template - Deploys network baseline resources including VPC, subnets, Transit Gateway attachment, security groups, and VPC Flow Logs'
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Account Configuration"
+        Parameters:
+          - AccountName
+          - AccountId
+          - LoggingAccountId
+      - Label:
+          default: "VPC Configuration"
+        Parameters:
+          - VpcCidr
+          - AvailabilityZones
+      - Label:
+          default: "Network Services"
+        Parameters:
+          - EnableTransitGateway
+          - TransitGatewayId
+          - EnableFlowLogs
+
+Parameters:
+  AccountName:
+    Type: String
+    Description: Name of the AWS account
+  
+  AccountId:
+    Type: String
+    Description: AWS account ID where baseline is deployed
+  
+  VpcCidr:
+    Type: String
+    Description: CIDR block for the VPC
+    Default: '10.0.0.0/16'
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+  
+  AvailabilityZones:
+    Type: Number
+    Description: Number of availability zones to use
+    Default: 3
+    MinValue: 2
+    MaxValue: 3
+  
+  EnableTransitGateway:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Enable Transit Gateway attachment
+  
+  TransitGatewayId:
+    Type: String
+    Description: ID of the Transit Gateway to attach to
+    Default: ''
+  
+  EnableFlowLogs:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Enable VPC Flow Logs
+  
+  LoggingAccountId:
+    Type: String
+    Description: ID of the centralized logging account
+
+Conditions:
+  EnableTransitGatewayCondition: !And
+    - !Equals [!Ref EnableTransitGateway, 'true']
+    - !Not [!Equals [!Ref TransitGatewayId, '']]
+  EnableFlowLogsCondition: !Equals [!Ref EnableFlowLogs, 'true']
+  UseThreeAZs: !Equals [!Ref AvailabilityZones, 3]
+
+Resources:
+  # VPC
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-vpc'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Internet Gateway
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-igw'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Attach Internet Gateway to VPC
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # Public Subnet 1
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [0, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-public-${AWS::Region}a'
+        - Key: Tier
+          Value: Public
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Public Subnet 2
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [1, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [1, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-public-${AWS::Region}b'
+        - Key: Tier
+          Value: Public
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Public Subnet 3
+  PublicSubnet3:
+    Type: AWS::EC2::Subnet
+    Condition: UseThreeAZs
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [2, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [2, !GetAZs '']
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-public-${AWS::Region}c'
+        - Key: Tier
+          Value: Public
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Private Subnet 1
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [3, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-private-${AWS::Region}a'
+        - Key: Tier
+          Value: Private
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Private Subnet 2
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [4, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-private-${AWS::Region}b'
+        - Key: Tier
+          Value: Private
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Private Subnet 3
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Condition: UseThreeAZs
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [5, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [2, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-private-${AWS::Region}c'
+        - Key: Tier
+          Value: Private
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Isolated Subnet 1
+  IsolatedSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [6, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [0, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-isolated-${AWS::Region}a'
+        - Key: Tier
+          Value: Isolated
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Isolated Subnet 2
+  IsolatedSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [7, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [1, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-isolated-${AWS::Region}b'
+        - Key: Tier
+          Value: Isolated
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Isolated Subnet 3
+  IsolatedSubnet3:
+    Type: AWS::EC2::Subnet
+    Condition: UseThreeAZs
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Select [8, !Cidr [!Ref VpcCidr, 9, 8]]
+      AvailabilityZone: !Select [2, !GetAZs '']
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-isolated-${AWS::Region}c'
+        - Key: Tier
+          Value: Isolated
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Elastic IPs for NAT Gateways
+  NatEIP1:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-nat-eip-1'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  NatEIP2:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-nat-eip-2'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  NatEIP3:
+    Type: AWS::EC2::EIP
+    Condition: UseThreeAZs
+    DependsOn: AttachGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-nat-eip-3'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # NAT Gateways
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP1.AllocationId
+      SubnetId: !Ref PublicSubnet1
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-nat-1'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP2.AllocationId
+      SubnetId: !Ref PublicSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-nat-2'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  NatGateway3:
+    Type: AWS::EC2::NatGateway
+    Condition: UseThreeAZs
+    Properties:
+      AllocationId: !GetAtt NatEIP3.AllocationId
+      SubnetId: !Ref PublicSubnet3
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-nat-3'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Public Route Table
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-public-rt'
+        - Key: Tier
+          Value: Public
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Public Route to Internet Gateway
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId: !Ref InternetGateway
+
+  # Public Subnet Route Table Associations
+  PublicSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: UseThreeAZs
+    Properties:
+      SubnetId: !Ref PublicSubnet3
+      RouteTableId: !Ref PublicRouteTable
+
+  # Private Route Tables
+  PrivateRouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-private-rt-1'
+        - Key: Tier
+          Value: Private
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  PrivateRouteTable2:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-private-rt-2'
+        - Key: Tier
+          Value: Private
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  PrivateRouteTable3:
+    Type: AWS::EC2::RouteTable
+    Condition: UseThreeAZs
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-private-rt-3'
+        - Key: Tier
+          Value: Private
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Private Routes to NAT Gateways
+  PrivateRoute1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable1
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref NatGateway1
+
+  PrivateRoute2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable2
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref NatGateway2
+
+  PrivateRoute3:
+    Type: AWS::EC2::Route
+    Condition: UseThreeAZs
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable3
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId: !Ref NatGateway3
+
+  # Private Subnet Route Table Associations
+  PrivateSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet1
+      RouteTableId: !Ref PrivateRouteTable1
+
+  PrivateSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable2
+
+  PrivateSubnetRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: UseThreeAZs
+    Properties:
+      SubnetId: !Ref PrivateSubnet3
+      RouteTableId: !Ref PrivateRouteTable3
+
+  # Isolated Route Table
+  IsolatedRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-isolated-rt'
+        - Key: Tier
+          Value: Isolated
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Isolated Subnet Route Table Associations
+  IsolatedSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref IsolatedSubnet1
+      RouteTableId: !Ref IsolatedRouteTable
+
+  IsolatedSubnetRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref IsolatedSubnet2
+      RouteTableId: !Ref IsolatedRouteTable
+
+  IsolatedSubnetRouteTableAssociation3:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: UseThreeAZs
+    Properties:
+      SubnetId: !Ref IsolatedSubnet3
+      RouteTableId: !Ref IsolatedRouteTable
+
+  # Transit Gateway Attachment
+  TransitGatewayAttachment:
+    Type: AWS::EC2::TransitGatewayAttachment
+    Condition: EnableTransitGatewayCondition
+    Properties:
+      TransitGatewayId: !Ref TransitGatewayId
+      VpcId: !Ref VPC
+      SubnetIds: !If
+        - UseThreeAZs
+        - - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+          - !Ref PrivateSubnet3
+        - - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-tgw-attachment'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # VPC Flow Logs Role
+  FlowLogsRole:
+    Type: AWS::IAM::Role
+    Condition: EnableFlowLogsCondition
+    Properties:
+      RoleName: !Sub '${AccountName}-vpc-flow-logs-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: vpc-flow-logs.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-vpc-flow-logs-role'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # VPC Flow Logs Policy
+  FlowLogsPolicy:
+    Type: AWS::IAM::Policy
+    Condition: EnableFlowLogsCondition
+    Properties:
+      PolicyName: !Sub '${AccountName}-vpc-flow-logs-policy'
+      Roles:
+        - !Ref FlowLogsRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+              - 'logs:DescribeLogGroups'
+              - 'logs:DescribeLogStreams'
+            Resource: '*'
+
+  # CloudWatch Log Group for Flow Logs
+  FlowLogsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: EnableFlowLogsCondition
+    Properties:
+      LogGroupName: !Sub '/aws/vpc/flowlogs/${AccountName}'
+      RetentionInDays: 30
+
+  # VPC Flow Logs
+  VPCFlowLog:
+    Type: AWS::EC2::FlowLog
+    Condition: EnableFlowLogsCondition
+    Properties:
+      ResourceType: VPC
+      ResourceId: !Ref VPC
+      TrafficType: ALL
+      LogDestinationType: cloud-watch-logs
+      LogGroupName: !Ref FlowLogsLogGroup
+      DeliverLogsPermissionArn: !GetAtt FlowLogsRole.Arn
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-vpc-flow-log'
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Security Groups
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${AccountName}-web-sg'
+      GroupDescription: Security group for web tier (HTTP/HTTPS)
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: '0.0.0.0/0'
+          Description: Allow HTTP from anywhere
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: '0.0.0.0/0'
+          Description: Allow HTTPS from anywhere
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: '0.0.0.0/0'
+          Description: Allow all outbound traffic
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-web-sg'
+        - Key: Tier
+          Value: Web
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  AppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${AccountName}-app-sg'
+      GroupDescription: Security group for application tier
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: '0.0.0.0/0'
+          Description: Allow all outbound traffic
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-app-sg'
+        - Key: Tier
+          Value: Application
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  AppSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref AppSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref WebSecurityGroup
+      Description: Allow traffic from web tier
+
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${AccountName}-database-sg'
+      GroupDescription: Security group for database tier
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: '0.0.0.0/0'
+          Description: Allow all outbound traffic
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-database-sg'
+        - Key: Tier
+          Value: Database
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  DatabaseSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref DatabaseSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref AppSecurityGroup
+      Description: Allow traffic from application tier
+
+  ManagementSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${AccountName}-management-sg'
+      GroupDescription: Security group for management/bastion hosts
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref VpcCidr
+          Description: Allow SSH from VPC
+        - IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+          CidrIp: !Ref VpcCidr
+          Description: Allow RDP from VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: '0.0.0.0/0'
+          Description: Allow all outbound traffic
+      Tags:
+        - Key: Name
+          Value: !Sub '${AccountName}-management-sg'
+        - Key: Tier
+          Value: Management
+        - Key: ManagedBy
+          Value: AccountFactory
+
+Outputs:
+  VpcId:
+    Description: ID of the VPC
+    Value: !Ref VPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VpcId'
+  
+  VpcCidr:
+    Description: CIDR block of the VPC
+    Value: !Ref VpcCidr
+    Export:
+      Name: !Sub '${AWS::StackName}-VpcCidr'
+  
+  PublicSubnets:
+    Description: List of public subnet IDs
+    Value: !If
+      - UseThreeAZs
+      - !Join [',', [!Ref PublicSubnet1, !Ref PublicSubnet2, !Ref PublicSubnet3]]
+      - !Join [',', [!Ref PublicSubnet1, !Ref PublicSubnet2]]
+    Export:
+      Name: !Sub '${AWS::StackName}-PublicSubnets'
+  
+  PrivateSubnets:
+    Description: List of private subnet IDs
+    Value: !If
+      - UseThreeAZs
+      - !Join [',', [!Ref PrivateSubnet1, !Ref PrivateSubnet2, !Ref PrivateSubnet3]]
+      - !Join [',', [!Ref PrivateSubnet1, !Ref PrivateSubnet2]]
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnets'
+  
+  IsolatedSubnets:
+    Description: List of isolated subnet IDs
+    Value: !If
+      - UseThreeAZs
+      - !Join [',', [!Ref IsolatedSubnet1, !Ref IsolatedSubnet2, !Ref IsolatedSubnet3]]
+      - !Join [',', [!Ref IsolatedSubnet1, !Ref IsolatedSubnet2]]
+    Export:
+      Name: !Sub '${AWS::StackName}-IsolatedSubnets'
+  
+  TransitGatewayAttachmentId:
+    Condition: EnableTransitGatewayCondition
+    Description: ID of the Transit Gateway attachment
+    Value: !Ref TransitGatewayAttachment
+    Export:
+      Name: !Sub '${AWS::StackName}-TransitGatewayAttachmentId'
+  
+  WebSecurityGroupId:
+    Description: ID of the web security group
+    Value: !Ref WebSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-WebSecurityGroupId'
+  
+  AppSecurityGroupId:
+    Description: ID of the application security group
+    Value: !Ref AppSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-AppSecurityGroupId'
+  
+  DatabaseSecurityGroupId:
+    Description: ID of the database security group
+    Value: !Ref DatabaseSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-DatabaseSecurityGroupId'
+  
+  ManagementSecurityGroupId:
+    Description: ID of the management security group
+    Value: !Ref ManagementSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-ManagementSecurityGroupId'
+  
+  StackStatus:
+    Description: Status of the network baseline deployment
+    Value: 'Network baseline deployed successfully'

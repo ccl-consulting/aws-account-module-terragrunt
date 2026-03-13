@@ -1,0 +1,443 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Security Baseline StackSet Template - Deploys security baseline resources including IAM roles, Security Hub, GuardDuty, AWS Config, and CloudTrail'
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Account Configuration"
+        Parameters:
+          - AccountName
+          - AccountId
+          - LoggingAccountId
+          - SecurityAccountId
+      - Label:
+          default: "Security Services"
+        Parameters:
+          - EnableSecurityHub
+          - EnableGuardDuty
+          - EnableConfig
+          - EnableCloudTrail
+      - Label:
+          default: "Compliance Standards"
+        Parameters:
+          - ComplianceStandards
+
+Parameters:
+  AccountName:
+    Type: String
+    Description: Name of the AWS account
+  
+  AccountId:
+    Type: String
+    Description: AWS account ID where baseline is deployed
+  
+  LoggingAccountId:
+    Type: String
+    Description: ID of the centralized logging account
+  
+  SecurityAccountId:
+    Type: String
+    Description: ID of the centralized security account
+  
+  EnableSecurityHub:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Enable AWS Security Hub
+  
+  EnableGuardDuty:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Enable Amazon GuardDuty
+  
+  EnableConfig:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Enable AWS Config
+  
+  EnableCloudTrail:
+    Type: String
+    Default: 'true'
+    AllowedValues: ['true', 'false']
+    Description: Enable AWS CloudTrail
+  
+  ComplianceStandards:
+    Type: CommaDelimitedList
+    Default: 'aws-foundational-security-best-practices'
+    Description: Comma-separated list of Security Hub compliance standards to enable
+
+Conditions:
+  EnableSecurityHubCondition: !Equals [!Ref EnableSecurityHub, 'true']
+  EnableGuardDutyCondition: !Equals [!Ref EnableGuardDuty, 'true']
+  EnableConfigCondition: !Equals [!Ref EnableConfig, 'true']
+  EnableCloudTrailCondition: !Equals [!Ref EnableCloudTrail, 'true']
+
+Resources:
+  # Cross-Account Admin Role
+  CrossAccountAdminRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AccountFactory-CrossAccountAdmin
+      Description: Cross-account administrative access role for Account Factory
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${SecurityAccountId}:root'
+            Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Sub 'AccountFactory-${AccountId}'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/ReadOnlyAccess'
+      Tags:
+        - Key: Name
+          Value: AccountFactory-CrossAccountAdmin
+        - Key: Purpose
+          Value: Cross-account administrative access
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Cross-Account Read-Only Role
+  CrossAccountReadOnlyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AccountFactory-CrossAccountReadOnly
+      Description: Cross-account read-only access role for auditing
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${SecurityAccountId}:root'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/ReadOnlyAccess'
+      Tags:
+        - Key: Name
+          Value: AccountFactory-CrossAccountReadOnly
+        - Key: Purpose
+          Value: Cross-account read-only access
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Security Tooling Role
+  SecurityToolingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AccountFactory-SecurityTooling
+      Description: Role for security tooling integration
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${SecurityAccountId}:root'
+            Action: 'sts:AssumeRole'
+          - Effect: Allow
+            Principal:
+              Service:
+                - securityhub.amazonaws.com
+                - guardduty.amazonaws.com
+                - config.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Tags:
+        - Key: Name
+          Value: AccountFactory-SecurityTooling
+        - Key: Purpose
+          Value: Security tooling integration
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Security Tooling Policy
+  SecurityToolingPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: SecurityToolingPermissions
+      Roles:
+        - !Ref SecurityToolingRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'securityhub:*'
+              - 'guardduty:*'
+              - 'config:*'
+              - 'cloudtrail:DescribeTrails'
+              - 'cloudtrail:GetTrailStatus'
+              - 'cloudtrail:LookupEvents'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 'iam:GetRole'
+              - 'iam:GetRolePolicy'
+              - 'iam:ListRolePolicies'
+              - 'iam:ListAttachedRolePolicies'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+            Resource: !Sub 'arn:aws:logs:*:${AccountId}:log-group:/aws/securityhub/*'
+
+  # Break-Glass Access Role
+  BreakGlassRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AccountFactory-BreakGlass
+      Description: Emergency break-glass access role with full administrative permissions
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${SecurityAccountId}:root'
+            Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Sub 'BreakGlass-${AccountId}'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AdministratorAccess'
+      MaxSessionDuration: 3600
+      Tags:
+        - Key: Name
+          Value: AccountFactory-BreakGlass
+        - Key: Purpose
+          Value: Emergency administrative access
+        - Key: ManagedBy
+          Value: AccountFactory
+        - Key: Critical
+          Value: 'true'
+
+  # Security Hub
+  SecurityHub:
+    Type: AWS::SecurityHub::Hub
+    Condition: EnableSecurityHubCondition
+    Properties:
+      ControlFindingGenerator: SECURITY_CONTROL
+      EnableDefaultStandards: false
+      Tags:
+        Name: AccountFactory-SecurityHub
+        ManagedBy: AccountFactory
+
+  # GuardDuty Detector
+  GuardDutyDetector:
+    Type: AWS::GuardDuty::Detector
+    Condition: EnableGuardDutyCondition
+    Properties:
+      Enable: true
+      FindingPublishingFrequency: FIFTEEN_MINUTES
+      DataSources:
+        S3Logs:
+          Enable: true
+        Kubernetes:
+          AuditLogs:
+            Enable: true
+        MalwareProtection:
+          ScanEc2InstanceWithFindings:
+            EbsVolumes:
+              Enable: true
+      Tags:
+        - Key: Name
+          Value: AccountFactory-GuardDuty
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Config Recorder Role
+  ConfigRole:
+    Type: AWS::IAM::Role
+    Condition: EnableConfigCondition
+    Properties:
+      RoleName: AccountFactory-ConfigRole
+      Description: Role for AWS Config to record configuration changes
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: config.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/ConfigRole'
+      Tags:
+        - Key: Name
+          Value: AccountFactory-ConfigRole
+        - Key: Purpose
+          Value: AWS Config compliance monitoring
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # Config Recorder
+  ConfigRecorder:
+    Type: AWS::Config::ConfigurationRecorder
+    Condition: EnableConfigCondition
+    Properties:
+      Name: account-factory-config-recorder
+      RoleArn: !GetAtt ConfigRole.Arn
+      RecordingGroup:
+        AllSupported: true
+        IncludeGlobalResourceTypes: true
+        RecordingStrategy:
+          UseOnly: ALL_SUPPORTED_RESOURCE_TYPES
+
+  # Config Delivery Channel
+  ConfigDeliveryChannel:
+    Type: AWS::Config::DeliveryChannel
+    Condition: EnableConfigCondition
+    Properties:
+      Name: account-factory-config-delivery
+      S3BucketName: !Sub 'account-factory-config-${LoggingAccountId}'
+      S3KeyPrefix: !Sub 'config/${AccountId}'
+      SnsTopicARN: !Sub 'arn:aws:sns:${AWS::Region}:${LoggingAccountId}:account-factory-config-topic'
+      ConfigSnapshotDeliveryProperties:
+        DeliveryFrequency: TwentyFour_Hours
+
+  # CloudTrail Role
+  CloudTrailRole:
+    Type: AWS::IAM::Role
+    Condition: EnableCloudTrailCondition
+    Properties:
+      RoleName: AccountFactory-CloudTrailRole
+      Description: Role for CloudTrail to write logs to CloudWatch
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudtrail.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Tags:
+        - Key: Name
+          Value: AccountFactory-CloudTrailRole
+        - Key: Purpose
+          Value: CloudTrail logging
+        - Key: ManagedBy
+          Value: AccountFactory
+
+  # CloudWatch Log Group for CloudTrail
+  CloudTrailLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: EnableCloudTrailCondition
+    Properties:
+      LogGroupName: /aws/cloudtrail/account-factory
+      RetentionInDays: 90
+
+  # CloudTrail Policy for CloudWatch Logs
+  CloudTrailCloudWatchPolicy:
+    Type: AWS::IAM::Policy
+    Condition: EnableCloudTrailCondition
+    Properties:
+      PolicyName: CloudTrailCloudWatchLogsPolicy
+      Roles:
+        - !Ref CloudTrailRole
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AWSCloudTrailCreateLogStream
+            Effect: Allow
+            Action:
+              - 'logs:CreateLogStream'
+            Resource: !Sub '${CloudTrailLogGroup.Arn}:*'
+          - Sid: AWSCloudTrailPutLogEvents
+            Effect: Allow
+            Action:
+              - 'logs:PutLogEvents'
+            Resource: !Sub '${CloudTrailLogGroup.Arn}:*'
+
+  # CloudTrail
+  CloudTrail:
+    Type: AWS::CloudTrail::Trail
+    Condition: EnableCloudTrailCondition
+    DependsOn:
+      - CloudTrailCloudWatchPolicy
+    Properties:
+      TrailName: account-factory-trail
+      S3BucketName: !Sub 'account-factory-cloudtrail-${LoggingAccountId}'
+      S3KeyPrefix: !Sub 'cloudtrail/${AccountId}'
+      IncludeGlobalServiceEvents: true
+      IsMultiRegionTrail: true
+      EnableLogFileValidation: true
+      IsLogging: true
+      CloudWatchLogsLogGroupArn: !GetAtt CloudTrailLogGroup.Arn
+      CloudWatchLogsRoleArn: !GetAtt CloudTrailRole.Arn
+      InsightSelectors:
+        - InsightType: ApiCallRateInsight
+        - InsightType: ApiErrorRateInsight
+      EventSelectors:
+        - IncludeManagementEvents: true
+          ReadWriteType: All
+          DataResources:
+            - Type: 'AWS::S3::Object'
+              Values:
+                - 'arn:aws:s3:::*/*'
+            - Type: 'AWS::Lambda::Function'
+              Values:
+                - 'arn:aws:lambda:*:*:function/*'
+      Tags:
+        - Key: Name
+          Value: AccountFactory-CloudTrail
+        - Key: ManagedBy
+          Value: AccountFactory
+
+Outputs:
+  CrossAccountAdminRoleArn:
+    Description: ARN of the cross-account admin role
+    Value: !GetAtt CrossAccountAdminRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CrossAccountAdminRoleArn'
+  
+  CrossAccountReadOnlyRoleArn:
+    Description: ARN of the cross-account read-only role
+    Value: !GetAtt CrossAccountReadOnlyRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CrossAccountReadOnlyRoleArn'
+  
+  SecurityToolingRoleArn:
+    Description: ARN of the security tooling role
+    Value: !GetAtt SecurityToolingRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-SecurityToolingRoleArn'
+  
+  BreakGlassRoleArn:
+    Description: ARN of the break-glass role
+    Value: !GetAtt BreakGlassRole.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-BreakGlassRoleArn'
+  
+  SecurityHubArn:
+    Condition: EnableSecurityHubCondition
+    Description: ARN of the Security Hub
+    Value: !Sub 'arn:aws:securityhub:${AWS::Region}:${AWS::AccountId}:hub/default'
+    Export:
+      Name: !Sub '${AWS::StackName}-SecurityHubArn'
+  
+  GuardDutyDetectorId:
+    Condition: EnableGuardDutyCondition
+    Description: ID of the GuardDuty detector
+    Value: !Ref GuardDutyDetector
+    Export:
+      Name: !Sub '${AWS::StackName}-GuardDutyDetectorId'
+  
+  ConfigRecorderName:
+    Condition: EnableConfigCondition
+    Description: Name of the Config recorder
+    Value: !Ref ConfigRecorder
+    Export:
+      Name: !Sub '${AWS::StackName}-ConfigRecorderName'
+  
+  CloudTrailArn:
+    Condition: EnableCloudTrailCondition
+    Description: ARN of the CloudTrail
+    Value: !GetAtt CloudTrail.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-CloudTrailArn'
+  
+  StackStatus:
+    Description: Status of the security baseline deployment
+    Value: 'Security baseline deployed successfully'
