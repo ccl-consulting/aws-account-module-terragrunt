@@ -22,6 +22,7 @@ This Terragrunt module provides a complete solution for establishing an AWS Land
 ### Key Features
 
 - **AWS Control Tower Integration** - Automated Landing Zone deployment with guardrails
+- **Account Factory** - Automated account provisioning with standardized security and network baselines
 - **Multi-Account Architecture** - Secure account isolation following AWS best practices  
 - **Multi-Region Support** - Deploy across multiple AWS regions with centralized governance
 - **Organizational Units** - Structured account organization with workload separation
@@ -126,16 +127,107 @@ We provide comprehensive examples for different organizational needs:
 
 **[View Detailed Examples Documentation](examples/README.md)**
 
+## Account Factory
+
+The Account Factory module provides automated, declarative account provisioning with standardized security and networking baselines. This enables platform teams to provision AWS accounts at scale while maintaining consistent security and compliance controls.
+
+### Key Capabilities
+
+- **Declarative Account Provisioning** - Define accounts in Terragrunt configuration with automatic validation
+- **Automated Security Baselines** - Deploy Security Hub, GuardDuty, AWS Config, and CloudTrail to all accounts
+- **Automated Network Baselines** - Create VPCs, Transit Gateway attachments, and security groups automatically
+- **Service Control Policies** - Centralized SCP management across accounts and OUs
+- **Delegated Administrators** - Configure delegated admins for AWS services
+- **Baseline Versioning** - Support for pinned and latest version strategies with update detection
+- **Account Catalog** - Track all account metadata and baseline versions in outputs
+
+### Architecture
+
+![Account Factory Architecture](diagrams/account-factory-architecture.png)
+
+The Account Factory uses AWS CloudFormation StackSets to deploy baselines across multiple accounts and regions in parallel, with built-in failure isolation and retry logic.
+
+### Quick Start with Account Factory
+
+```hcl
+# terragrunt.hcl
+terraform {
+  source = "./account-factory"
+}
+
+inputs = {
+  management_account_id = "123456789012"
+  logging_account_id    = "123456789013"
+  security_account_id   = "123456789014"
+  governed_regions      = ["us-east-1", "us-west-2"]
+
+  existing_ou_ids = {
+    "Development" = "ou-xxxx-11111111"
+    "Production"  = "ou-xxxx-33333333"
+  }
+
+  accounts = {
+    dev-app = {
+      email               = "aws-dev-app@example.com"
+      organizational_unit = "Development"
+      security_baseline   = "default"
+      network_baseline    = "standard"
+      tags = {
+        Owner       = "dev-team@example.com"
+        Environment = "development"
+      }
+    }
+    prod-app = {
+      email               = "aws-prod-app@example.com"
+      organizational_unit = "Production"
+      security_baseline   = "default"
+      network_baseline    = "standard"
+      tags = {
+        Owner       = "platform-team@example.com"
+        Environment = "production"
+      }
+    }
+  }
+
+  security_baselines = {
+    default = {
+      version                    = "1.0.0"
+      enable_security_hub        = true
+      enable_guardduty           = true
+      enable_config              = true
+      cloudtrail_s3_bucket_name  = "my-org-cloudtrail"
+    }
+  }
+
+  network_baselines = {
+    standard = {
+      version            = "1.0.0"
+      vpc_cidr           = "10.0.0.0/16"
+      availability_zones = 3
+      transit_gateway_id = "tgw-xxxxxxxxxxxxx"
+    }
+  }
+}
+```
+
+**[View Account Factory Documentation](account-factory/README.md)**
+
 ## Security & Compliance
 
 ### Built-in Security Controls
 
 - **AWS Control Tower Guardrails** - Preventive and detective controls
+- **Account Factory Security Baselines** - Automated deployment of security services to all accounts
+  - Security Hub with CIS AWS Foundations Benchmark
+  - GuardDuty for threat detection
+  - AWS Config for compliance monitoring
+  - CloudTrail for audit logging
 - **IAM Best Practices** - Least privilege access with proper role separation
 - **CloudTrail Logging** - Centralized audit logging across all accounts
 - **AWS Config** - Configuration compliance monitoring
 - **Cross-Account Backup** - Automated backup policies with encryption
 - **Network Security** - VPC isolation and security group controls
+- **Service Control Policies** - Preventive guardrails enforced at the OU level
 
 ### Compliance Frameworks
 
@@ -171,6 +263,62 @@ tags = {
 ```
 
 ## Advanced Configuration
+
+### Account Factory with Custom Baselines
+
+```hcl
+inputs = {
+  # Account Factory configuration
+  accounts = {
+    prod-web = {
+      email               = "aws-prod-web@company.com"
+      organizational_unit = "Production"
+      security_baseline   = "high-security"
+      network_baseline    = "dmz"
+      baseline_version_strategy = "pinned"  # or "latest"
+      tags = {
+        Application = "web-frontend"
+        Compliance  = "PCI-DSS"
+      }
+    }
+  }
+
+  # Custom security baseline for PCI-DSS compliance
+  security_baselines = {
+    high-security = {
+      version                    = "2.0.0"
+      enable_security_hub        = true
+      enable_guardduty           = true
+      enable_config              = true
+      config_rules               = ["pci-dss-*"]
+      cloudtrail_s3_bucket_name  = "org-audit-logs"
+      cloudtrail_kms_key_id      = "arn:aws:kms:..."
+    }
+  }
+
+  # Custom network baseline with DMZ architecture
+  network_baselines = {
+    dmz = {
+      version            = "2.0.0"
+      vpc_cidr           = "10.100.0.0/16"
+      availability_zones = 3
+      public_subnets     = true
+      nat_gateways       = 3
+      transit_gateway_id = "tgw-xxxxxxxxxxxxx"
+      flow_logs_enabled  = true
+    }
+  }
+
+  # Service Control Policies
+  service_control_policies = {
+    deny-root-access = {
+      description = "Deny root user access"
+      policy      = file("policies/deny-root.json")
+      targets     = ["ou-xxxx-11111111"]
+    }
+  }
+}
+```
 
 ### Multi-Region Deployment
 
@@ -361,6 +509,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **If this module helped you, please consider giving it a star!**
 
 Made with care by [CCL Consulting](https://ccl-consulting.fr)
+Contact [Rahma Sinien](rahma@ccl-consulting.fr)
 
 </div>
 
