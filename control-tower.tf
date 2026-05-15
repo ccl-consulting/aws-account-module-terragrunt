@@ -120,7 +120,7 @@ resource "aws_iam_role_policy_attachment" "control_tower_config_role_for_organiz
 
 resource "aws_controltower_landing_zone" "zone" {
   manifest_json = templatefile("${path.module}/template/landingzonemanifest.tftpl", { governed_regions = var.governed_regions, logging_account_id = aws_organizations_account.logging.id, security_account_id = aws_organizations_account.security.id })
-  version       = "3.3"
+  version       = "4.0"
 
   depends_on = [
     data.aws_organizations_organization.org,

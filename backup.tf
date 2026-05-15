@@ -1,16 +1,19 @@
 resource "aws_organizations_delegated_administrator" "backups" {
   account_id        = aws_organizations_account.backups.id
   service_principal = "backup.amazonaws.com"
+  depends_on = [aws_organizations_organization.org]
 }
 
 resource "aws_backup_global_settings" "cross_account_backup" {
   global_settings = {
     "isCrossAccountBackupEnabled" = "true"
   }
+  depends_on = [aws_organizations_organization.org]
 }
 
 resource "aws_organizations_resource_policy" "allow_delegated_backup_administrator" {
   content = data.aws_iam_policy_document.organization_backup_policy.json
+  depends_on = [aws_organizations_organization.org]
 }
 
 data "aws_iam_policy_document" "organization_backup_policy" {
