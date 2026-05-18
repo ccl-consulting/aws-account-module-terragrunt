@@ -41,10 +41,9 @@ data "aws_iam_policy_document" "control_tower_cloudtrail_role" {
   }
 }
 
-resource "aws_iam_role_policy" "control_tower_cloudtrail_role_policy" {
-  name   = "AWSControlTowerCloudTrailRolePolicy"
-  role   = aws_iam_role.control_tower_cloudtrail_role.id
-  policy = data.aws_iam_policy_document.control_tower_cloudtrail_role_policy_content.json
+resource "aws_iam_role_policy_attachment" "control_tower_cloudtrail_role_policy" {
+  role       = aws_iam_role.control_tower_cloudtrail_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSControlTowerCloudTrailRolePolicy"
 }
 
 data "aws_iam_policy_document" "control_tower_cloudtrail_role_policy_content" {
@@ -129,7 +128,8 @@ resource "aws_controltower_landing_zone" "zone" {
     aws_iam_role.control_tower_config_aggregator_role_for_organizations,
     aws_iam_role_policy.control_tower_stackset_role_policy,
     aws_iam_role_policy_attachment.control_tower_config_role_for_organization_service_role,
-    aws_iam_role_policy_attachment.control_tower_service_role_policy
+    aws_iam_role_policy_attachment.control_tower_service_role_policy,
+    aws_iam_role_policy_attachment.control_tower_cloudtrail_role_policy
   ]
 
   # Needed to avoid retentionDays = "60" -> 60 at each apply.
