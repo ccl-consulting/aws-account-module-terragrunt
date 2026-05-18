@@ -8,12 +8,6 @@ resource "aws_organizations_organizational_unit" "suspended" {
   parent_id = data.aws_organizations_organization.org.roots[0].id
 }
 
-# OU required by Control Tower for foundational accounts (logging & security)
-import {
-  to = aws_organizations_organizational_unit.security
-  id = "ou-iarn-2krpc04h"
-}
-
 resource "aws_organizations_organizational_unit" "security" {
   name      = "Security"
   parent_id = data.aws_organizations_organization.org.roots[0].id
