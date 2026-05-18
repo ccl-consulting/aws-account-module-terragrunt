@@ -8,6 +8,17 @@ resource "aws_organizations_organizational_unit" "suspended" {
   parent_id = data.aws_organizations_organization.org.roots[0].id
 }
 
+# OU required by Control Tower for foundational accounts (logging & security)
+import {
+  to = aws_organizations_organizational_unit.security
+  id = "ou-iarn-2krpc04h"
+}
+
+resource "aws_organizations_organizational_unit" "security" {
+  name      = "Security"
+  parent_id = data.aws_organizations_organization.org.roots[0].id
+}
+
 resource "aws_organizations_organizational_unit" "common_services" {
   name      = "Common Services"
   parent_id = data.aws_organizations_organization.org.roots[0].id
@@ -38,7 +49,7 @@ resource "aws_organizations_organizational_unit" "workloads_dev" {
 resource "aws_organizations_account" "logging" {
   name      = "Logging"
   email     = "${var.email_local_part}_logging@${var.email_domain}"
-  parent_id = data.aws_organizations_organization.org.roots[0].id
+  parent_id = aws_organizations_organizational_unit.security.id
 
   close_on_deletion = true
 
@@ -50,7 +61,7 @@ resource "aws_organizations_account" "logging" {
 resource "aws_organizations_account" "security" {
   name      = "Security"
   email     = "${var.email_local_part}_security@${var.email_domain}"
-  parent_id = data.aws_organizations_organization.org.roots[0].id
+  parent_id = aws_organizations_organizational_unit.security.id
 
   close_on_deletion = true
 
