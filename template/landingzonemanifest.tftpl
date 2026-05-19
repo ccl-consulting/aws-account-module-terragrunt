@@ -1,13 +1,5 @@
 {
   "governedRegions": ${jsonencode(toset(governed_regions))},
-  "organizationStructure":{
-    "security":{
-      "name":"Security"
-    },
-    "sandbox":{
-      "name":"Sandbox"
-    }
-  },
   "centralizedLogging":{
     "accountId":"${logging_account_id}",
     "configurations":{
@@ -21,9 +13,25 @@
     "enabled":true
   },
   "securityRoles":{
+    "enabled": true,
     "accountId":"${security_account_id}"
   },
   "accessManagement":{
     "enabled":false
+  },
+   "backup": {
+    "enabled": false
+  },
+  "config": {
+    "accountId": "${security_account_id}",
+    "enabled": true,
+    "configurations": {
+      "loggingBucket": {
+        "retentionDays": 60
+      },
+      "accessLoggingBucket": {
+        "retentionDays": 60
+      }
+    }
   }
 }
