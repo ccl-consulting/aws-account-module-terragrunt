@@ -59,6 +59,20 @@ variable "email_domain" {
   type        = string
 }
 
+variable "full_email" {
+  description = "Full email address override per workload environment. When non-empty, replaces the constructed email for that environment's accounts."
+  type = object({
+    prod    = optional(string, "")
+    staging = optional(string, "")
+    dev     = optional(string, "")
+  })
+  default = {
+    prod    = ""
+    staging = ""
+    dev     = ""
+  }
+}
+
 variable "scps" {
   description = "Map of Service Control Policies to create and attach to OUs or accounts."
   type = map(object({
