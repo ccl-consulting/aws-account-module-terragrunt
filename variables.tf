@@ -58,3 +58,14 @@ variable "email_domain" {
   description = "The domain part of the email address used for the organization accounts."
   type        = string
 }
+
+variable "scps" {
+  description = "Map of Service Control Policies to create and attach to OUs or accounts."
+  type = map(object({
+    name        = string
+    description = optional(string, "")
+    content     = string
+    targets     = list(string)
+  }))
+  default = {}
+}
