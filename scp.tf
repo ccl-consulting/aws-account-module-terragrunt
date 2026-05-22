@@ -7,18 +7,24 @@ resource "aws_organizations_policy" "scps" {
 }
 
 locals {
-  _scp_target_map = {
-    "ou:workloads"         = aws_organizations_organizational_unit.workloads.id
-    "ou:workloads_prod"    = aws_organizations_organizational_unit.workloads_prod.id
-    "ou:workloads_staging" = aws_organizations_organizational_unit.workloads_staging.id
-    "ou:workloads_dev"     = aws_organizations_organizational_unit.workloads_dev.id
-    "ou:security"          = aws_organizations_organizational_unit.security.id
-    "ou:common_services"   = aws_organizations_organizational_unit.common_services.id
-    "ou:suspended"         = aws_organizations_organizational_unit.suspended.id
-    "account:logging"      = aws_organizations_account.logging.id
-    "account:security"     = aws_organizations_account.security.id
-    "account:backups"      = aws_organizations_account.backups.id
+  _scp_ou_map = { for ou in 
+  [
+    aws_organizations_organizational_unit.suspended,
+    aws_organizations_organizational_unit.security,
+    aws_organizations_organizational_unit.common_services,
+    aws_organizations_organizational_unit.workloads,
+    aws_organizations_organizational_unit.workloads_prod,
+    aws_organizations_organizational_unit.workloads_staging,
+    aws_organizations_organizational_unit.workloads_dev,
+  ] : "ou:${ou.name}" => ou.id }
+
+  # Tous les comptes de l'org (gérés ou non par ce module) — permet de cibler
+  # n'importe quel compte individuel par son nom, quelle que soit son OU
+  _scp_account_map = {
+    for acc in data.aws_organizations_organization.org.accounts : "account:${acc.name}" => acc.id
   }
+
+  _scp_target_map = merge(local._scp_ou_map, local._scp_account_map)
 
   _scp_attachments = flatten([
     for scp_key, scp in var.scps : [
