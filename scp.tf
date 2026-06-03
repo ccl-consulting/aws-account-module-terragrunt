@@ -7,8 +7,7 @@ resource "aws_organizations_policy" "scps" {
 }
 
 locals {
-  _scp_ou_map = { for ou in 
-  [
+  _scp_ou_map = { for ou in [
     aws_organizations_organizational_unit.suspended,
     aws_organizations_organizational_unit.security,
     aws_organizations_organizational_unit.common_services,
