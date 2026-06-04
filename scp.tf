@@ -23,7 +23,11 @@ locals {
     for acc in data.aws_organizations_organization.org.accounts : "account:${acc.name}" => acc.id
   }
 
-  _scp_target_map = merge(local._scp_ou_map, local._scp_account_map)
+  _scp_root_map = {
+    "root" = data.aws_organizations_organization.org.roots[0].id
+  }
+
+  _scp_target_map = merge(local._scp_root_map, local._scp_ou_map, local._scp_account_map)
 
   _scp_attachments = flatten([
     for scp_key, scp in var.scps : [
