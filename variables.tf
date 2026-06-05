@@ -72,3 +72,14 @@ variable "full_email" {
     dev     = ""
   }
 }
+
+variable "scps" {
+  description = "Map of Service Control Policies to create and attach to OUs or accounts."
+  type = map(object({
+    name        = string
+    description = optional(string, "")
+    content     = string
+    targets     = list(string)
+  }))
+  default = {}
+}
