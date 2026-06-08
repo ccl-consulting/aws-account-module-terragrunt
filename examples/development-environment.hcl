@@ -98,6 +98,8 @@ inputs = {
           "dev-prototype"
         ]
       )
+      
+      uat = []
     }
     
     # Minimal common services for development

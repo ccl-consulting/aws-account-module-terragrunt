@@ -16,9 +16,10 @@ inputs = {
   
   org_accounts = {
     workloads = {
-      prod = ["production"]
+      prod    = ["production"]
       staging = ["staging"]
-      dev = ["development"]
+      dev     = ["development"]
+      uat     = []
     }
     common_services = []
   }

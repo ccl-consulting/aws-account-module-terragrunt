@@ -15,6 +15,7 @@ locals {
     aws_organizations_organizational_unit.workloads_prod,
     aws_organizations_organizational_unit.workloads_staging,
     aws_organizations_organizational_unit.workloads_dev,
+    aws_organizations_organizational_unit.workloads_uat,
   ] : "ou:${ou.name}" => ou.id }
 
   # Tous les comptes de l'org (gérés ou non par ce module) — permet de cibler

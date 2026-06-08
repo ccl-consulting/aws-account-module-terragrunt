@@ -70,6 +70,8 @@ inputs = {
         "dev-databases",
         "dev-sandbox"
       ]
+      
+      uat = []
     }
     
     common_services = [
