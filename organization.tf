@@ -33,6 +33,11 @@ resource "aws_organizations_organizational_unit" "workloads_staging" {
   parent_id = aws_organizations_organizational_unit.workloads.id
 }
 
+resource "aws_organizations_organizational_unit" "workloads_uat" {
+  name      = "UAT"
+  parent_id = aws_organizations_organizational_unit.workloads.id
+}
+
 resource "aws_organizations_organizational_unit" "workloads_dev" {
   name      = "Dev"
   parent_id = aws_organizations_organizational_unit.workloads.id
@@ -111,6 +116,15 @@ resource "aws_organizations_account" "workloads_dev" {
   close_on_deletion = true
 }
 
+resource "aws_organizations_account" "workloads_uat" {
+  count     = length(var.org_accounts.workloads.uat)
+  name      = var.org_accounts.workloads.uat[count.index]
+  email     = var.full_email.uat != "" ? var.full_email.uat : "${var.email_local_part}_${var.org_accounts.workloads.uat[count.index]}@${var.email_domain}"
+  parent_id = aws_organizations_organizational_unit.workloads_uat.id
+
+  close_on_deletion = true
+}
+
 resource "aws_organizations_account" "common_services" {
   count     = length(var.org_accounts.common_services)
   name      = var.org_accounts.common_services[count.index]
@@ -124,7 +138,8 @@ locals {
   workload_accounts = concat(
     aws_organizations_account.workloads_dev[*],
     aws_organizations_account.workloads_staging[*],
-    aws_organizations_account.workloads_prod[*]
+    aws_organizations_account.workloads_prod[*],
+    aws_organizations_account.workloads_uat[*]
   )
 
   landing_zone_accounts = [

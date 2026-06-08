@@ -167,6 +167,7 @@ inputs = {
       prod    = local.all_prod_accounts
       staging = local.all_staging_accounts
       dev     = local.all_dev_accounts
+      uat     = []
     }
     
     # Extensive common services for enterprise needs

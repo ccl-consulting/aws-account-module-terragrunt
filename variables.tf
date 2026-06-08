@@ -33,6 +33,7 @@ variable "org_accounts" {
       prod    = list(string)
       staging = list(string)
       dev     = list(string)
+      uat     = list(string)
     })
     common_services = list(string)
   })
@@ -41,6 +42,7 @@ variable "org_accounts" {
       prod    = ["prod"]
       staging = ["staging"]
       dev     = ["dev"]
+      uat     = ["uat"]
     }
     common_services = []
   }
@@ -65,11 +67,13 @@ variable "full_email" {
     prod    = optional(string, "")
     staging = optional(string, "")
     dev     = optional(string, "")
+    uat     = optional(string, "")
   })
   default = {
     prod    = ""
     staging = ""
     dev     = ""
+    uat     = ""
   }
 }
 
