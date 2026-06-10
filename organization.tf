@@ -96,6 +96,11 @@ resource "aws_organizations_account" "workloads_prod" {
   parent_id = aws_organizations_organizational_unit.workloads_prod.id
 
   close_on_deletion = true
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [name, email]
+  }
 }
 
 resource "aws_organizations_account" "workloads_staging" {
@@ -105,6 +110,11 @@ resource "aws_organizations_account" "workloads_staging" {
   parent_id = aws_organizations_organizational_unit.workloads_staging.id
 
   close_on_deletion = true
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [name, email]
+  }
 }
 
 resource "aws_organizations_account" "workloads_dev" {
@@ -114,6 +124,11 @@ resource "aws_organizations_account" "workloads_dev" {
   parent_id = aws_organizations_organizational_unit.workloads_dev.id
 
   close_on_deletion = true
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [name, email]
+  }
 }
 
 resource "aws_organizations_account" "workloads_uat" {
@@ -123,6 +138,11 @@ resource "aws_organizations_account" "workloads_uat" {
   parent_id = aws_organizations_organizational_unit.workloads_uat.id
 
   close_on_deletion = true
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [name, email]
+  }
 }
 
 resource "aws_organizations_account" "common_services" {
@@ -132,6 +152,11 @@ resource "aws_organizations_account" "common_services" {
   parent_id = aws_organizations_organizational_unit.common_services.id
 
   close_on_deletion = true
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [name, email]
+  }
 }
 
 locals {
