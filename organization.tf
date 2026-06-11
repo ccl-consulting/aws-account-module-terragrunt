@@ -92,7 +92,7 @@ resource "aws_organizations_account" "backups" {
 resource "aws_organizations_account" "workloads_prod" {
   count     = length(var.org_accounts.workloads.prod)
   name      = var.org_accounts.workloads.prod[count.index]
-  email     = var.full_email.prod != "" ? var.full_email.prod : "${var.email_local_part}_${var.org_accounts.workloads.prod[count.index]}@${var.email_domain}"
+  email     = var.full_email.prod != "" ? var.full_email.prod : "${var.email_local_part}_${lower(replace(replace(var.org_accounts.workloads.prod[count.index], " ", ""), "-", ""))}@${var.email_domain}"
   parent_id = aws_organizations_organizational_unit.workloads_prod.id
 
   close_on_deletion = true
@@ -105,7 +105,7 @@ resource "aws_organizations_account" "workloads_prod" {
 resource "aws_organizations_account" "workloads_staging" {
   count     = length(var.org_accounts.workloads.staging)
   name      = var.org_accounts.workloads.staging[count.index]
-  email     = var.full_email.staging != "" ? var.full_email.staging : "${var.email_local_part}_${var.org_accounts.workloads.staging[count.index]}@${var.email_domain}"
+  email     = var.full_email.staging != "" ? var.full_email.staging : "${var.email_local_part}_${lower(replace(replace(var.org_accounts.workloads.staging[count.index], " ", ""), "-", ""))}@${var.email_domain}"
   parent_id = aws_organizations_organizational_unit.workloads_staging.id
 
   close_on_deletion = true
@@ -118,7 +118,7 @@ resource "aws_organizations_account" "workloads_staging" {
 resource "aws_organizations_account" "workloads_dev" {
   count     = length(var.org_accounts.workloads.dev)
   name      = var.org_accounts.workloads.dev[count.index]
-  email     = var.full_email.dev != "" ? var.full_email.dev : "${var.email_local_part}_${var.org_accounts.workloads.dev[count.index]}@${var.email_domain}"
+  email     = var.full_email.dev != "" ? var.full_email.dev : "${var.email_local_part}_${lower(replace(replace(var.org_accounts.workloads.dev[count.index], " ", ""), "-", ""))}@${var.email_domain}"
   parent_id = aws_organizations_organizational_unit.workloads_dev.id
 
   close_on_deletion = true
@@ -131,7 +131,7 @@ resource "aws_organizations_account" "workloads_dev" {
 resource "aws_organizations_account" "workloads_uat" {
   count     = length(var.org_accounts.workloads.uat)
   name      = var.org_accounts.workloads.uat[count.index]
-  email     = var.full_email.uat != "" ? var.full_email.uat : "${var.email_local_part}_${var.org_accounts.workloads.uat[count.index]}@${var.email_domain}"
+  email     = var.full_email.uat != "" ? var.full_email.uat : "${var.email_local_part}_${lower(replace(replace(var.org_accounts.workloads.uat[count.index], " ", ""), "-", ""))}@${var.email_domain}"
   parent_id = aws_organizations_organizational_unit.workloads_uat.id
 
   close_on_deletion = true
@@ -144,7 +144,7 @@ resource "aws_organizations_account" "workloads_uat" {
 resource "aws_organizations_account" "common_services" {
   count     = length(var.org_accounts.common_services)
   name      = var.org_accounts.common_services[count.index]
-  email     = "${var.email_local_part}_${var.org_accounts.common_services[count.index]}@${var.email_domain}"
+  email     = "${var.email_local_part}_${lower(replace(replace(var.org_accounts.common_services[count.index], " ", ""), "-", ""))}@${var.email_domain}"
   parent_id = aws_organizations_organizational_unit.common_services.id
 
   close_on_deletion = true
