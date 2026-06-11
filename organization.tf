@@ -99,7 +99,6 @@ resource "aws_organizations_account" "workloads_prod" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [name, email]
   }
 }
 
@@ -113,7 +112,6 @@ resource "aws_organizations_account" "workloads_staging" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [name, email]
   }
 }
 
@@ -127,7 +125,6 @@ resource "aws_organizations_account" "workloads_dev" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [name, email]
   }
 }
 
@@ -141,7 +138,6 @@ resource "aws_organizations_account" "workloads_uat" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [name, email]
   }
 }
 
@@ -155,7 +151,6 @@ resource "aws_organizations_account" "common_services" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [name, email]
   }
 }
 
