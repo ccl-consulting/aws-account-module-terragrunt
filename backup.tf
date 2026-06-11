@@ -5,7 +5,9 @@ resource "aws_organizations_delegated_administrator" "backups" {
 
 resource "aws_backup_global_settings" "cross_account_backup" {
   global_settings = {
-    "isCrossAccountBackupEnabled" = "true"
+    "isCrossAccountBackupEnabled"      = "true"
+    "isDelegatedAdministratorEnabled"  = "true"
+    "isMpaEnabled"                     = "false"
   }
 }
 
