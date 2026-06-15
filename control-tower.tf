@@ -118,7 +118,7 @@ resource "aws_iam_role_policy_attachment" "control_tower_config_role_for_organiz
 }
 
 resource "aws_controltower_landing_zone" "zone" {
-  manifest_json = templatefile("${path.module}/template/landingzonemanifest.tftpl", { governed_regions = var.governed_regions, logging_account_id = aws_organizations_account.logging.id, security_account_id = aws_organizations_account.security.id })
+  manifest_json = templatefile("${path.module}/template/landingzonemanifest.tftpl", { governed_regions = var.governed_regions, log_retention_days = var.log_retention_days, logging_account_id = aws_organizations_account.logging.id, security_account_id = aws_organizations_account.security.id })
   version       = "4.0"
 
   depends_on = [
@@ -132,11 +132,7 @@ resource "aws_controltower_landing_zone" "zone" {
     aws_iam_role_policy_attachment.control_tower_cloudtrail_role_policy
   ]
 
-  # Needed to avoid retentionDays = "60" -> 60 at each apply.
-  # Have not figured out yet why AWS gives syntax error with quotes in .tftpl
-  lifecycle {
-    ignore_changes = [
-      manifest_json
-    ]
-  }
+  # retentionDays must be a JSON number (not a string) in the .tftpl
+  # manifest_json is NOT ignored so that changes to governed_regions and other manifest
+  # fields are detected by terraform plan.
 }

@@ -4,10 +4,10 @@
     "accountId":"${logging_account_id}",
     "configurations":{
       "loggingBucket":{
-        "retentionDays": 60
+        "retentionDays": ${log_retention_days}
       },
       "accessLoggingBucket":{
-        "retentionDays": 60
+        "retentionDays": ${log_retention_days}
       }
     },
     "enabled":true
@@ -27,10 +27,10 @@
     "enabled": true,
     "configurations": {
       "loggingBucket": {
-        "retentionDays": 60
+        "retentionDays": ${log_retention_days}
       },
       "accessLoggingBucket": {
-        "retentionDays": 60
+        "retentionDays": ${log_retention_days}
       }
     }
   }

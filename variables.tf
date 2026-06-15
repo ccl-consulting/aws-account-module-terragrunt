@@ -17,6 +17,12 @@ variable "governed_regions" {
   default     = ["eu-west-3"]
 }
 
+variable "log_retention_days" {
+  description = "Retention period in days for Control Tower logging and access logging buckets."
+  type        = number
+  default     = 60
+}
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)
