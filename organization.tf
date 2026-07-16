@@ -144,7 +144,7 @@ resource "aws_organizations_account" "workloads_uat" {
 resource "aws_organizations_account" "common_services" {
   count     = length(var.org_accounts.common_services)
   name      = var.org_accounts.common_services[count.index]
-  email     = "${var.email_local_part}_${lower(replace(var.org_accounts.common_services[count.index], " ", ""))}@${var.email_domain}"
+  email     = var.full_email.common_services != "" ? var.full_email.common_services : "${var.email_local_part}_${lower(replace(var.org_accounts.common_services[count.index], " ", ""))}@${var.email_domain}"
   parent_id = aws_organizations_organizational_unit.common_services.id
 
   close_on_deletion = true

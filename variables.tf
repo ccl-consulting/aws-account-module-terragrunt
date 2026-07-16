@@ -74,12 +74,14 @@ variable "full_email" {
     staging = optional(string, "")
     dev     = optional(string, "")
     uat     = optional(string, "")
+    common_services = optional(string, "")
   })
   default = {
     prod    = ""
     staging = ""
     dev     = ""
     uat     = ""
+    common_services = ""
   }
 }
 
