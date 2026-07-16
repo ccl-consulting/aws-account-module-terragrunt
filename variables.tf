@@ -70,17 +70,17 @@ variable "email_domain" {
 variable "full_email" {
   description = "Full email address override per workload environment. When non-empty, replaces the constructed email for that environment's accounts."
   type = object({
-    prod    = optional(string, "")
-    staging = optional(string, "")
-    dev     = optional(string, "")
-    uat     = optional(string, "")
+    prod            = optional(string, "")
+    staging         = optional(string, "")
+    dev             = optional(string, "")
+    uat             = optional(string, "")
     common_services = optional(string, "")
   })
   default = {
-    prod    = ""
-    staging = ""
-    dev     = ""
-    uat     = ""
+    prod            = ""
+    staging         = ""
+    dev             = ""
+    uat             = ""
     common_services = ""
   }
 }
