@@ -85,7 +85,7 @@ jobs:
         fi
         
     - name: Upload Checkov results to GitHub Advanced Security
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v4
       if: always() && steps.check_sarif.outputs.sarif_exists == 'true'
       with:
         sarif_file: checkov-results.sarif
